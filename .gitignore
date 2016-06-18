@@ -1,0 +1,6 @@
+.DS_Store
+*.log
+coverage/
+node_modules/
+hast-util-sanitize.js
+hast-util-sanitize.min.js

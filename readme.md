@@ -1,0 +1,237 @@
+# hast-util-sanitize [![Build Status][travis-badge]][travis] [![Coverage Status][codecov-badge]][codecov]
+
+<!--lint disable heading-increment list-item-spacing-->
+
+Sanitize [HAST][].
+
+## Installation
+
+[npm][npm-install]:
+
+```bash
+npm install hast-util-sanitize
+```
+
+## Usage
+
+Dependencies:
+
+```javascript
+var h = require('hastscript');
+var u = require('unist-builder');
+var sanitize = require('hast-util-sanitize');
+var toHTML = require('hast-util-to-html');
+```
+
+Transform:
+
+```javascript
+var tree = h('div', {
+    onmouseover: 'alert("alpha")'
+}, [
+    h('a', {
+        href: 'jAva script:alert("bravo")',
+        onclick: 'alert("charlie")'
+    }, 'delta'),
+    u('text', '\n'),
+    h('script', 'alert("charlie")'),
+    u('text', '\n'),
+    h('img', {src: 'x', onerror: 'alert("delta")'}),
+    u('text', '\n'),
+    h('iframe', {src: 'javascript:alert("echo")'}),
+    u('text', '\n'),
+    h('math', h('mi', {
+        'xlink:href': 'data:x,<script>alert("foxtrot")</script>'
+    }))
+]);
+```
+
+Compile:
+
+```javascript
+var unsanitized = toHTML(tree);
+var sanitized = toHTML(sanitize(tree));
+```
+
+Unsanitized:
+
+```html
+<div onmouseover="alert(&#x22;alpha&#x22;)"><a href="jAva script:alert(&#x22;bravo&#x22;)" onclick="alert(&#x22;charlie&#x22;)">delta</a>
+<script>alert("charlie")</script>
+<img src="x" onerror="alert(&#x22;delta&#x22;)">
+<iframe src="javascript:alert(&#x22;echo&#x22;)"></iframe>
+<math><mi xlink:href="data:x,&#x3C;script&#x3E;alert(&#x22;foxtrot&#x22;)&#x3C;/script&#x3E;"></mi></math></div>
+```
+
+Sanitized:
+
+```html
+<div><a>delta</a>
+
+<img src="x">
+
+</div>
+```
+
+## API
+
+### `sanitize(node[, schema])`
+
+Sanitize the given [HAST][] tree.
+
+###### Parameters
+
+*   `node` ([`HASTNode`][hast]).
+*   `schema` ([`Schema`][schema], optional).
+
+###### Returns
+
+[`HASTNode`][hast] — A new node.
+
+### `Schema`
+
+Configuration.  If not given, defaults to [GitHub][] style sanitation.
+If any key isn’t given, it defaults to GH’s style too.
+
+For a thorough sample, see the packages [`github.json`][schema-github].
+
+###### `attributes`
+
+Map of tag-names to allowed attributes (`Object.<Array.<string>>`).
+
+The special `'*'` key sets attributes allowed on all elements.
+
+```js
+"attributes": {
+  "a": [
+    "href"
+  ],
+  "img": [
+    "src",
+    "longDesc"
+  ],
+  // ...
+  "*": [
+    "abbr",
+    "accept",
+    "acceptCharset",
+    // ...
+    "vspace",
+    "width",
+    "itemProp"
+  ]
+}
+```
+
+###### `tagNames`
+
+List of allowed tag-names (`Array.<string>`).
+
+```js
+"tagNames": [
+  "h1",
+  "h2",
+  "h3",
+  // ...
+  "strike",
+  "summary",
+  "details"
+]
+```
+
+###### `protocols`
+
+Map of protocols to support for attributes (`Object.<Array.<string>>`).
+
+```js
+"protocols": {
+  "href": [
+    "http",
+    "https",
+    "mailto"
+  ],
+  // ...
+  "longDesc": [
+    "http",
+    "https"
+  ]
+}
+```
+
+###### `ancestors`
+
+Map of tag-names to their required ancestral elements
+(`Object.<Array.<string>>`).
+
+```js
+"ancestors": {
+  "li": [
+    "ol",
+    "ul"
+  ],
+  // ...
+  "tr": [
+    "table"
+  ]
+}
+```
+
+###### `clobber`
+
+List of allowed attribute-names which can clobber (`Array.<string>`).
+
+```js
+"clobber": [
+  "name",
+  "id"
+]
+```
+
+###### `clobberPrefix`
+
+Prefix (`string`) to use before potentially clobbering properties.
+
+```js
+"clobberPrefix": "user-content"
+```
+
+###### `strip`
+
+Tag-names to strip from the tree (`Array.<string>`).
+
+By default, unsafe elements are replaced by their content.  Some elements,
+should however be entirely stripped from the tree.
+
+```js
+"strip": [
+  "script"
+]
+```
+
+## License
+
+[MIT][license] © [Titus Wormer][author]
+
+<!-- Definitions -->
+
+[travis-badge]: https://img.shields.io/travis/wooorm/hast-util-sanitize.svg
+
+[travis]: https://travis-ci.org/wooorm/hast-util-sanitize
+
+[codecov-badge]: https://img.shields.io/codecov/c/github/wooorm/hast-util-sanitize.svg
+
+[codecov]: https://codecov.io/github/wooorm/hast-util-sanitize
+
+[npm-install]: https://docs.npmjs.com/cli/install
+
+[license]: LICENSE
+
+[author]: http://wooorm.com
+
+[hast]: https://github.com/wooorm/hast
+
+[schema]: #schema
+
+[github]: https://github.com/jch/html-pipeline/blob/master/lib/html/pipeline/sanitization_filter.rb
+
+[schema-github]: https://github.com/wooorm/hast-util-sanitize/blob/master/lib/github.json
