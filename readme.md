@@ -91,9 +91,19 @@ Sanitize the given [HAST][] tree.
 ### `Schema`
 
 Configuration.  If not given, defaults to [GitHub][] style sanitation.
-If any key isn’t given, it defaults to GH’s style too.
+If any top-level key isn’t given, it defaults to GH’s style too.
 
 For a thorough sample, see the packages [`github.json`][schema-github].
+
+To extend the the standard schema with a few changes, clone `github.json`
+like so:
+
+```js
+var clone = require('clone');
+var base = require('hast-util-sanitize/lib/github.json');
+var schema = clone(base);
+schema.attributes['*'].push('className');
+```
 
 ###### `attributes`
 
