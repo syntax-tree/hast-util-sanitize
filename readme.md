@@ -111,6 +111,9 @@ Map of tag-names to allowed attributes (`Object.<Array.<string>>`).
 
 The special `'*'` key sets attributes allowed on all elements.
 
+One special value, namely `'data*'`, can be used to allow all `data`
+properties.
+
 ```js
 "attributes": {
   "a": [

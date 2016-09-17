@@ -13,6 +13,8 @@ var test = require('tape');
 var html = require('hast-util-to-html');
 var h = require('hastscript');
 var u = require('unist-builder');
+var merge = require('deepmerge');
+var gh = require('./lib/github');
 var sanitize = require('./index.js');
 
 /* eslint-disable no-script-url, max-params */
@@ -255,6 +257,27 @@ test('sanitize()', function (t) {
       sanitize(h('img', {href: '#heading'})),
       h('img'),
       'should ignore mismatched specific properties'
+    );
+
+    st.deepEqual(
+      sanitize(h('div', {dataFoo: 'bar'})),
+      h('div'),
+      'should ignore unspecified properties'
+    );
+
+    st.deepEqual(
+      sanitize(h('div', {dataFoo: 'bar'})),
+      h('div'),
+      'should ignore unspecified properties'
+    );
+
+    st.deepEqual(
+      sanitize(
+        h('div', {dataFoo: 'bar'}),
+        merge(gh, {attributes: {'*': ['data*']}})
+      ),
+      h('div', {dataFoo: 'bar'}),
+      'should allow `data*`'
     );
 
     st.deepEqual(
