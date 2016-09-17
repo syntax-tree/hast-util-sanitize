@@ -27,22 +27,22 @@ Transform:
 
 ```javascript
 var tree = h('div', {
-    onmouseover: 'alert("alpha")'
+  onmouseover: 'alert("alpha")'
 }, [
-    h('a', {
-        href: 'jAva script:alert("bravo")',
-        onclick: 'alert("charlie")'
-    }, 'delta'),
-    u('text', '\n'),
-    h('script', 'alert("charlie")'),
-    u('text', '\n'),
-    h('img', {src: 'x', onerror: 'alert("delta")'}),
-    u('text', '\n'),
-    h('iframe', {src: 'javascript:alert("echo")'}),
-    u('text', '\n'),
-    h('math', h('mi', {
-        'xlink:href': 'data:x,<script>alert("foxtrot")</script>'
-    }))
+  h('a', {
+    href: 'jAva script:alert("bravo")',
+    onclick: 'alert("charlie")'
+  }, 'delta'),
+  u('text', '\n'),
+  h('script', 'alert("charlie")'),
+  u('text', '\n'),
+  h('img', {src: 'x', onerror: 'alert("delta")'}),
+  u('text', '\n'),
+  h('iframe', {src: 'javascript:alert("echo")'}),
+  u('text', '\n'),
+  h('math', h('mi', {
+    'xlink:href': 'data:x,<script>alert("foxtrot")</script>'
+  }))
 ]);
 ```
 
@@ -95,7 +95,7 @@ If any top-level key isn’t given, it defaults to GH’s style too.
 
 For a thorough sample, see the packages [`github.json`][schema-github].
 
-To extend the the standard schema with a few changes, clone `github.json`
+To extend the standard schema with a few changes, clone `github.json`
 like so:
 
 ```js
