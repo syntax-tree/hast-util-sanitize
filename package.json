@@ -33,7 +33,7 @@
     "remark-preset-wooorm": "^1.0.0",
     "tape": "^4.0.0",
     "unist-builder": "^1.0.1",
-    "xo": "^0.16.0"
+    "xo": "^0.17.0"
   },
   "scripts": {
     "build-md": "remark . --quiet --frail",
@@ -55,13 +55,7 @@
     "space": true,
     "rules": {
       "no-negated-condition": "off",
-      "guard-for-in": "off",
-      "no-eq-null": "off",
-      "eqeqeq": [
-        2,
-        "allow-null"
-      ],
-      "max-lines": "off"
+      "guard-for-in": "off"
     },
     "ignores": [
       "hast-util-sanitize.js"

@@ -351,17 +351,17 @@ test('sanitize()', function (t) {
     st.test('href`', function (sst) {
       testAllURLs(sst, 'a', 'href', {
         valid: {
-          'anchor': '#heading',
-          'relative': '/file.html',
-          'search': 'example.com?foo:bar',
-          'hash': 'example.com#foo:bar',
+          anchor: '#heading',
+          relative: '/file.html',
+          search: 'example.com?foo:bar',
+          hash: 'example.com#foo:bar',
           'protocol-less': 'www.example.com',
-          'mailto': 'mailto:foo@bar.com',
-          'https': 'http://example.com',
-          'http': 'http://example.com'
+          mailto: 'mailto:foo@bar.com',
+          https: 'http://example.com',
+          http: 'http://example.com'
         },
         invalid: {
-          'javascript': 'javascript:alert(1)',
+          javascript: 'javascript:alert(1)',
           'Unicode LS/PS I': '\u2028javascript:alert(1)',
           'Unicode Whitespace (#1)': ' javascript:alert(1)',
           'Unicode Whitespace (#2)': ' javascript:alert(1)',
@@ -376,17 +376,17 @@ test('sanitize()', function (t) {
     st.test('`cite`', function (sst) {
       testAllURLs(sst, 'blockquote', 'cite', {
         valid: {
-          'anchor': '#heading',
-          'relative': '/file.html',
-          'search': 'example.com?foo:bar',
-          'hash': 'example.com#foo:bar',
+          anchor: '#heading',
+          relative: '/file.html',
+          search: 'example.com?foo:bar',
+          hash: 'example.com#foo:bar',
           'protocol-less': 'www.example.com',
-          'https': 'http://example.com',
-          'http': 'http://example.com'
+          https: 'http://example.com',
+          http: 'http://example.com'
         },
         invalid: {
-          'mailto': 'mailto:foo@bar.com',
-          'javascript': 'javascript:alert(1)',
+          mailto: 'mailto:foo@bar.com',
+          javascript: 'javascript:alert(1)',
           'Unicode LS/PS I': '\u2028javascript:alert(1)',
           'Unicode Whitespace (#1)': ' javascript:alert(1)',
           'Unicode Whitespace (#2)': ' javascript:alert(1)',
@@ -401,17 +401,17 @@ test('sanitize()', function (t) {
     st.test('`src`', function (sst) {
       testAllURLs(sst, 'img', 'src', {
         valid: {
-          'anchor': '#heading',
-          'relative': '/file.html',
-          'search': 'example.com?foo:bar',
-          'hash': 'example.com#foo:bar',
+          anchor: '#heading',
+          relative: '/file.html',
+          search: 'example.com?foo:bar',
+          hash: 'example.com#foo:bar',
           'protocol-less': 'www.example.com',
-          'https': 'http://example.com',
-          'http': 'http://example.com'
+          https: 'http://example.com',
+          http: 'http://example.com'
         },
         invalid: {
-          'mailto': 'mailto:foo@bar.com',
-          'javascript': 'javascript:alert(1)',
+          mailto: 'mailto:foo@bar.com',
+          javascript: 'javascript:alert(1)',
           'Unicode LS/PS I': '\u2028javascript:alert(1)',
           'Unicode Whitespace (#1)': ' javascript:alert(1)',
           'Unicode Whitespace (#2)': ' javascript:alert(1)',
@@ -426,17 +426,17 @@ test('sanitize()', function (t) {
     st.test('`longDesc`', function (sst) {
       testAllURLs(sst, 'img', 'longDesc', {
         valid: {
-          'anchor': '#heading',
-          'relative': '/file.html',
-          'search': 'example.com?foo:bar',
-          'hash': 'example.com#foo:bar',
+          anchor: '#heading',
+          relative: '/file.html',
+          search: 'example.com?foo:bar',
+          hash: 'example.com#foo:bar',
           'protocol-less': 'www.example.com',
-          'https': 'http://example.com',
-          'http': 'http://example.com'
+          https: 'http://example.com',
+          http: 'http://example.com'
         },
         invalid: {
-          'mailto': 'mailto:foo@bar.com',
-          'javascript': 'javascript:alert(1)',
+          mailto: 'mailto:foo@bar.com',
+          javascript: 'javascript:alert(1)',
           'Unicode LS/PS I': '\u2028javascript:alert(1)',
           'Unicode Whitespace (#1)': ' javascript:alert(1)',
           'Unicode Whitespace (#2)': ' javascript:alert(1)',
