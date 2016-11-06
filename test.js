@@ -1,11 +1,3 @@
-/**
- * @author Titus Wormer
- * @copyright 2016 Titus Wormer
- * @license MIT
- * @module hast-util-sanitize
- * @fileoverview Test suite for `hast-util-sanitize`.
- */
-
 'use strict';
 
 /* Dependencies. */
@@ -18,35 +10,6 @@ var gh = require('./lib/github');
 var sanitize = require('./index.js');
 
 /* eslint-disable no-script-url, max-params */
-
-/* Check */
-function toString() {
-  return 'alert(1);';
-}
-
-/* Coverage. */
-toString();
-
-/* Test `valid` `url`s in `prop` on `tagName`. */
-function testURLs(t, tagName, prop, urls, valid) {
-  Object.keys(urls).forEach(function (name) {
-    var props = {};
-
-    props[prop] = urls[name];
-
-    t.deepEqual(
-      sanitize(h(tagName, props)),
-      h(tagName, valid ? props : {}),
-      'should ' + (valid ? 'allow' : 'clean') + ' ' + name
-    );
-  });
-}
-
-/* Test `valid` and `invalid` `url`s in `prop` on `tagName`. */
-function testAllURLs(t, tagName, prop, all) {
-  testURLs(t, tagName, prop, all.valid, true);
-  testURLs(t, tagName, prop, all.invalid, false);
-}
 
 /* Tests. */
 test('sanitize()', function (t) {
@@ -541,3 +504,32 @@ test('sanitize()', function (t) {
 
   t.end();
 });
+
+/* Coverage. */
+toString();
+
+/* Check */
+function toString() {
+  return 'alert(1);';
+}
+
+/* Test `valid` and `invalid` `url`s in `prop` on `tagName`. */
+function testAllURLs(t, tagName, prop, all) {
+  testURLs(t, tagName, prop, all.valid, true);
+  testURLs(t, tagName, prop, all.invalid, false);
+}
+
+/* Test `valid` `url`s in `prop` on `tagName`. */
+function testURLs(t, tagName, prop, urls, valid) {
+  Object.keys(urls).forEach(function (name) {
+    var props = {};
+
+    props[prop] = urls[name];
+
+    t.deepEqual(
+      sanitize(h(tagName, props)),
+      h(tagName, valid ? props : {}),
+      'should ' + (valid ? 'allow' : 'clean') + ' ' + name
+    );
+  });
+}
