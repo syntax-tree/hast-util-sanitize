@@ -1,12 +1,10 @@
 # hast-util-sanitize [![Build Status][travis-badge]][travis] [![Coverage Status][codecov-badge]][codecov]
 
-<!--lint disable heading-increment list-item-spacing-->
-
 Sanitize [HAST][].
 
 ## Installation
 
-[npm][npm-install]:
+[npm][]:
 
 ```bash
 npm install hast-util-sanitize
@@ -14,18 +12,12 @@ npm install hast-util-sanitize
 
 ## Usage
 
-Dependencies:
-
 ```javascript
 var h = require('hastscript');
 var u = require('unist-builder');
 var sanitize = require('hast-util-sanitize');
 var toHTML = require('hast-util-to-html');
-```
 
-Transform:
-
-```javascript
 var tree = h('div', {
   onmouseover: 'alert("alpha")'
 }, [
@@ -44,11 +36,7 @@ var tree = h('div', {
     'xlink:href': 'data:x,<script>alert("foxtrot")</script>'
   }))
 ]);
-```
 
-Compile:
-
-```javascript
 var unsanitized = toHTML(tree);
 var sanitized = toHTML(sanitize(tree));
 ```
@@ -239,7 +227,7 @@ should however be entirely stripped from the tree.
 
 [codecov]: https://codecov.io/github/wooorm/hast-util-sanitize
 
-[npm-install]: https://docs.npmjs.com/cli/install
+[npm]: https://docs.npmjs.com/cli/install
 
 [license]: LICENSE
 
