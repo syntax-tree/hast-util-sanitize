@@ -28,7 +28,7 @@
     "esmangle": "^1.0.1",
     "hast-util-to-html": "^3.0.0",
     "hastscript": "^3.0.0",
-    "nyc": "^9.0.1",
+    "nyc": "^10.0.0",
     "remark-cli": "^2.0.0",
     "remark-preset-wooorm": "^1.0.0",
     "tape": "^4.0.0",
