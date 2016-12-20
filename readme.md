@@ -219,13 +219,13 @@ should however be entirely stripped from the tree.
 
 <!-- Definitions -->
 
-[travis-badge]: https://img.shields.io/travis/wooorm/hast-util-sanitize.svg
+[travis-badge]: https://img.shields.io/travis/syntax-tree/hast-util-sanitize.svg
 
-[travis]: https://travis-ci.org/wooorm/hast-util-sanitize
+[travis]: https://travis-ci.org/syntax-tree/hast-util-sanitize
 
-[codecov-badge]: https://img.shields.io/codecov/c/github/wooorm/hast-util-sanitize.svg
+[codecov-badge]: https://img.shields.io/codecov/c/github/syntax-tree/hast-util-sanitize.svg
 
-[codecov]: https://codecov.io/github/wooorm/hast-util-sanitize
+[codecov]: https://codecov.io/github/syntax-tree/hast-util-sanitize
 
 [npm]: https://docs.npmjs.com/cli/install
 
@@ -233,10 +233,10 @@ should however be entirely stripped from the tree.
 
 [author]: http://wooorm.com
 
-[hast]: https://github.com/wooorm/hast
+[hast]: https://github.com/syntax-tree/hast
 
 [schema]: #schema
 
 [github]: https://github.com/jch/html-pipeline/blob/master/lib/html/pipeline/sanitization_filter.rb
 
-[schema-github]: https://github.com/wooorm/hast-util-sanitize/blob/master/lib/github.json
+[schema-github]: lib/github.json
