@@ -43,7 +43,8 @@
     ],
     "src": [
       "http",
-      "https"
+      "https",
+      "blob"
     ],
     "longDesc": [
       "http",
