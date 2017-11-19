@@ -23,7 +23,7 @@
   },
   "devDependencies": {
     "browserify": "^14.0.0",
-    "deepmerge": "^1.2.0",
+    "deepmerge": "^2.0.0",
     "esmangle": "^1.0.1",
     "hast-util-to-html": "^3.0.0",
     "hastscript": "^3.0.0",
