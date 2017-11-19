@@ -12,7 +12,8 @@
   "bugs": "https://github.com/syntax-tree/hast-util-sanitize/issues",
   "author": "Titus Wormer <tituswormer@gmail.com> (http://wooorm.com)",
   "contributors": [
-    "Titus Wormer <tituswormer@gmail.com> (http://wooorm.com)"
+    "Titus Wormer <tituswormer@gmail.com> (http://wooorm.com)",
+    "Jason Switzer <jswitzer@gmail.com>"
   ],
   "files": [
     "lib",
