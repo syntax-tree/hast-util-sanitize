@@ -8,7 +8,7 @@
     "util",
     "sanitize"
   ],
-  "repository": "https://github.com/syntax-tree/hast-util-sanitize",
+  "repository": "syntax-tree/hast-util-sanitize",
   "bugs": "https://github.com/syntax-tree/hast-util-sanitize/issues",
   "author": "Titus Wormer <tituswormer@gmail.com> (http://wooorm.com)",
   "contributors": [
