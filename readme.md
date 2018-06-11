@@ -87,14 +87,17 @@ To extend the standard schema with a few changes, clone `github.json`
 like so:
 
 ```js
-var h = require('hastscript');
-var merge = require('deepmerge');
-var gh = require('hast-util-sanitize/lib/github');
+var h = require('hastscript')
+var merge = require('deepmerge')
+var gh = require('hast-util-sanitize/lib/github')
+var sanitize = require('hast-util-sanitize')
 
-var schema = merge(gh, {attributes: {'*': ['className']}});
+var schema = merge(gh, {attributes: {'*': ['className']}})
 
-var tree = sanitize(h('div', {className: ['foo']}), schema);
+var tree = sanitize(h('div', {className: ['foo']}), schema)
+
 // `tree` still has `className`.
+console.log(tree)
 ```
 
 ###### `attributes`
