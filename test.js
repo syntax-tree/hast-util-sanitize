@@ -7,7 +7,7 @@ var h = require('hastscript');
 var u = require('unist-builder');
 var merge = require('deepmerge');
 var gh = require('./lib/github');
-var sanitize = require('./index.js');
+var sanitize = require('.');
 
 /* eslint-disable no-script-url, max-params */
 
