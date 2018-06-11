@@ -13,18 +13,17 @@ npm install hast-util-sanitize
 ## Usage
 
 ```javascript
-var h = require('hastscript');
-var u = require('unist-builder');
-var sanitize = require('hast-util-sanitize');
-var toHTML = require('hast-util-to-html');
+var h = require('hastscript')
+var u = require('unist-builder')
+var sanitize = require('hast-util-sanitize')
+var toHTML = require('hast-util-to-html')
 
-var tree = h('div', {
-  onmouseover: 'alert("alpha")'
-}, [
-  h('a', {
-    href: 'jAva script:alert("bravo")',
-    onclick: 'alert("charlie")'
-  }, 'delta'),
+var tree = h('div', {onmouseover: 'alert("alpha")'}, [
+  h(
+    'a',
+    {href: 'jAva script:alert("bravo")', onclick: 'alert("charlie")'},
+    'delta'
+  ),
   u('text', '\n'),
   h('script', 'alert("charlie")'),
   u('text', '\n'),
@@ -32,13 +31,14 @@ var tree = h('div', {
   u('text', '\n'),
   h('iframe', {src: 'javascript:alert("echo")'}),
   u('text', '\n'),
-  h('math', h('mi', {
-    'xlink:href': 'data:x,<script>alert("foxtrot")</script>'
-  }))
-]);
+  h('math', h('mi', {'xlink:href': 'data:x,<script>alert("foxtrot")</script>'}))
+])
 
-var unsanitized = toHTML(tree);
-var sanitized = toHTML(sanitize(tree));
+var unsanitized = toHTML(tree)
+var sanitized = toHTML(sanitize(tree))
+
+console.log(unsanitized)
+console.log(sanitized)
 ```
 
 Unsanitized:
