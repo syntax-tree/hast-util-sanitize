@@ -53,10 +53,38 @@ test('sanitize()', function(t) {
       'should ignore `characterData`s'
     )
 
+    st.end()
+  })
+
+  t.test('`comment`', function(st) {
     st.equal(
       html(sanitize(u('comment', 'alpha'))),
       '',
-      'should ignore `comment`s'
+      'should ignore `comment`s by default'
+    )
+
+    st.equal(
+      html(sanitize(u('comment', 'alpha'), {allowComments: true})),
+      '<!--alpha-->',
+      'should allow `comment`s with `allowComments: true`'
+    )
+
+    st.end()
+  })
+
+  t.test('`doctype`', function(st) {
+    st.equal(
+      html(sanitize(u('doctype', {name: 'html'}, 'alpha'))),
+      '',
+      'should ignore `doctype`s by default'
+    )
+
+    st.equal(
+      html(
+        sanitize(u('doctype', {name: 'html'}, 'alpha'), {allowDoctypes: true})
+      ),
+      '<!DOCTYPE html>',
+      'should allow `doctype`s with `allowDoctypes: true`'
     )
 
     st.end()

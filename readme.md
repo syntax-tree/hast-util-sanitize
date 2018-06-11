@@ -93,7 +93,7 @@ var gh = require('hast-util-sanitize/lib/github');
 
 var schema = merge(gh, {attributes: {'*': ['className']}});
 
-var tree = sanitize(h('div', {className: ['foo']}));
+var tree = sanitize(h('div', {className: ['foo']}), schema);
 // `tree` still has `className`.
 ```
 
@@ -211,6 +211,22 @@ should however be entirely stripped from the tree.
 "strip": [
   "script"
 ]
+```
+
+###### `allowComments`
+
+Whether to allow comment nodes (`boolean`, default: `false`).
+
+```js
+"allowComments": true
+```
+
+###### `allowDoctypes`
+
+Whether to allow doctype nodes (`boolean`, default: `false`).
+
+```js
+"allowDoctypes": true
 ```
 
 ## Contribute
