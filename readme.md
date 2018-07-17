@@ -48,7 +48,7 @@ Unsanitized:
 <script>alert("charlie")</script>
 <img src="x" onerror="alert(&#x22;delta&#x22;)">
 <iframe src="javascript:alert(&#x22;echo&#x22;)"></iframe>
-<math><mi xlink:href="data:x,&#x3C;script&#x3E;alert(&#x22;foxtrot&#x22;)&#x3C;/script&#x3E;"></mi></math></div>
+<math><mi xlink:href="data:x,<script>alert(&#x22;foxtrot&#x22;)</script>"></mi></math></div>
 ```
 
 Sanitized:
