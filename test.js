@@ -4,6 +4,7 @@
 var test = require('tape')
 var html = require('hast-util-to-html')
 var h = require('hastscript')
+var s = require('hastscript/svg')
 var u = require('unist-builder')
 var merge = require('deepmerge')
 var gh = require('./lib/github')
@@ -190,10 +191,7 @@ test('sanitize()', function(t) {
     )
 
     st.deepEqual(
-      sanitize({
-        type: 'element',
-        tagName: 'div'
-      }),
+      sanitize({type: 'element', tagName: 'div'}),
       h(),
       'should support elements without children / properties'
     )
@@ -286,23 +284,13 @@ test('sanitize()', function(t) {
     )
 
     st.deepEqual(
-      sanitize(
-        u('element', {
-          tagName: 'img',
-          properties: {alt: null}
-        })
-      ),
+      sanitize(u('element', {tagName: 'img', properties: {alt: null}})),
       h('img'),
       'should ignore `null`'
     )
 
     st.deepEqual(
-      sanitize(
-        u('element', {
-          tagName: 'img',
-          properties: {alt: undefined}
-        })
-      ),
+      sanitize(u('element', {tagName: 'img', properties: {alt: undefined}})),
       h('img'),
       'should ignore `undefined`'
     )
@@ -316,15 +304,12 @@ test('sanitize()', function(t) {
     st.deepEqual(
       sanitize(h('div', {name: 'getElementById'})),
       h('div', {name: 'user-content-getElementById'}),
-      'should prevent clobbering (#1)'
+      'should prevent clobbering (#2)'
     )
 
     st.deepEqual(
       sanitize(
-        u('element', {
-          tagName: 'img',
-          properties: {alt: {toString: toString}}
-        })
+        u('element', {tagName: 'img', properties: {alt: {toString: toString}}})
       ),
       h('img'),
       'should ignore objects'
@@ -334,13 +319,17 @@ test('sanitize()', function(t) {
       sanitize(
         u('element', {
           tagName: 'img',
-          properties: {
-            alt: [1, true, 'three', [4], {toString: toString}]
-          }
+          properties: {alt: [1, true, 'three', [4], {toString: toString}]}
         })
       ),
       h('img', {alt: [1, true, 'three']}),
       'should supports arrays'
+    )
+
+    st.deepEqual(
+      sanitize(s('svg', {viewBox: '0 0 50 50'}, '!')),
+      u('text', '!'),
+      'should ignore `svg` elements'
     )
 
     st.test('href`', function(sst) {
