@@ -83,7 +83,7 @@ test('sanitize()', function(t) {
       html(
         sanitize(u('doctype', {name: 'html'}, 'alpha'), {allowDoctypes: true})
       ),
-      '<!DOCTYPE html>',
+      '<!doctype html>',
       'should allow `doctype`s with `allowDoctypes: true`'
     )
 
