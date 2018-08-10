@@ -127,6 +127,13 @@
     "q": [
       "cite"
     ],
+    "input": [
+      ["type", "checkbox"],
+      "disabled"
+    ],
+    "li": [
+      ["className", "task-list-item"]
+    ],
     "*": [
       "abbr",
       "accept",

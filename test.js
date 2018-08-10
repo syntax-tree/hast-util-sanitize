@@ -295,6 +295,48 @@ test('sanitize()', function(t) {
       'should ignore `undefined`'
     )
 
+    {
+      let ghMut = merge({}, gh)
+      ghMut.attributes.input = [['type', 'checkbox']]
+
+      st.deepEqual(
+        sanitize(
+          u('element', {tagName: 'input', properties: {type: 'checkbox'}}),
+          ghMut
+        ),
+        h('input', {type: 'checkbox'}),
+        'should allow values that match a single-value restriction'
+      )
+
+      st.deepEqual(
+        sanitize(
+          u('element', {tagName: 'input', properties: {type: 'text'}}),
+          ghMut
+        ),
+        h('input'),
+        "should ignore values that don't match a single-value restriction"
+      )
+
+      ghMut.attributes.input = [['type', ['checkbox', 'radio']]]
+
+      st.deepEqual(
+        sanitize(
+          u('element', {tagName: 'input', properties: {type: 'radio'}}),
+          ghMut
+        ),
+        h('input', {type: 'radio'}),
+        'should allow values that match a list restriction'
+      )
+
+      st.deepEqual(
+        sanitize(
+          u('element', {tagName: 'input', properties: {type: 'text'}}),
+          ghMut
+        ),
+        h('input'),
+        "should ignore values that don't match a list restriction"
+      )
+    }
     st.deepEqual(
       sanitize(h('div', {id: 'getElementById'})),
       h('div', {id: 'user-content-getElementById'}),
