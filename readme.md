@@ -1,4 +1,9 @@
-# hast-util-sanitize [![Build Status][travis-badge]][travis] [![Coverage Status][codecov-badge]][codecov]
+# hast-util-sanitize
+
+[![Build][build-badge]][build]
+[![Coverage][coverage-badge]][coverage]
+[![Downloads][downloads-badge]][downloads]
+[![Chat][chat-badge]][chat]
 
 Sanitize [HAST][].
 
@@ -246,13 +251,21 @@ repository, organisation, or community you agree to abide by its terms.
 
 <!-- Definitions -->
 
-[travis-badge]: https://img.shields.io/travis/syntax-tree/hast-util-sanitize.svg
+[build-badge]: https://img.shields.io/travis/syntax-tree/hast-util-sanitize.svg
 
-[travis]: https://travis-ci.org/syntax-tree/hast-util-sanitize
+[build]: https://travis-ci.org/syntax-tree/hast-util-sanitize
 
-[codecov-badge]: https://img.shields.io/codecov/c/github/syntax-tree/hast-util-sanitize.svg
+[coverage-badge]: https://img.shields.io/codecov/c/github/syntax-tree/hast-util-sanitize.svg
 
-[codecov]: https://codecov.io/github/syntax-tree/hast-util-sanitize
+[coverage]: https://codecov.io/github/syntax-tree/hast-util-sanitize
+
+[downloads-badge]: https://img.shields.io/npm/dm/hast-util-sanitize.svg
+
+[downloads]: https://www.npmjs.com/package/hast-util-sanitize
+
+[chat-badge]: https://img.shields.io/badge/join%20the%20community-on%20spectrum-7b16ff.svg
+
+[chat]: https://spectrum.chat/unified/rehype
 
 [npm]: https://docs.npmjs.com/cli/install
 
