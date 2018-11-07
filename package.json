@@ -25,7 +25,6 @@
   "devDependencies": {
     "browserify": "^16.0.0",
     "deepmerge": "^2.0.0",
-    "esmangle": "^1.0.1",
     "hast-util-to-html": "^5.0.0",
     "hastscript": "^5.0.0",
     "nyc": "^13.0.0",
@@ -33,13 +32,14 @@
     "remark-cli": "^6.0.0",
     "remark-preset-wooorm": "^4.0.0",
     "tape": "^4.0.0",
+    "tinyify": "^2.4.3",
     "unist-builder": "^1.0.1",
     "xo": "^0.23.0"
   },
   "scripts": {
     "format": "remark . -qfo && prettier --write '**/*.js' && xo --fix",
-    "build-bundle": "browserify index.js --bare -s hastUtilSanitize > hast-util-sanitize.js",
-    "build-mangle": "esmangle hast-util-sanitize.js > hast-util-sanitize.min.js",
+    "build-bundle": "browserify . -s hastUtilSanitize > hast-util-sanitize.js",
+    "build-mangle": "browserify . -s hastUtilSanitize -p tinyify > hast-util-sanitize.min.js",
     "build": "npm run build-bundle && npm run build-mangle",
     "test-api": "node test",
     "test-coverage": "nyc --reporter lcov tape test.js",
