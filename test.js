@@ -487,6 +487,110 @@ test('sanitize()', function(t) {
       })
     })
 
+    st.deepEqual(
+      sanitize(h('input')),
+      h('input', {type: 'checkbox', disabled: true}),
+      'should allow only disabled checkbox inputs'
+    )
+
+    st.deepEqual(
+      sanitize(h('input', {type: 'text'})),
+      h('input', {type: 'checkbox', disabled: true}),
+      'should not allow text inputs'
+    )
+
+    st.deepEqual(
+      sanitize(h('input', {type: 'checkbox', disabled: false})),
+      h('input', {type: 'checkbox', disabled: true}),
+      'should not allow enabled inputs'
+    )
+
+    st.deepEqual(
+      sanitize(h('ol', [h('li')])),
+      h('ol', [h('li')]),
+      'should allow list items'
+    )
+
+    st.deepEqual(
+      sanitize(h('ol', [h('li', {className: ['foo', 'bar']})])),
+      h('ol', [h('li', {className: []})]),
+      'should not allow classes on list items'
+    )
+
+    st.deepEqual(
+      sanitize(h('ol', [h('li', {className: ['foo', 'task-list-item']})])),
+      h('ol', [h('li', {className: ['task-list-item']})]),
+      'should only allow `task-list-item` as a class on list items'
+    )
+
+    st.deepEqual(
+      sanitize(h('select')),
+      u('root', []),
+      'should ignore some elements by default'
+    )
+
+    st.deepEqual(
+      sanitize(h('select'), merge(gh, {tagNames: ['select']})),
+      h('select'),
+      'should support allowing elements through the schema'
+    )
+
+    st.deepEqual(
+      sanitize(
+        h('select', {autoComplete: true}),
+        merge(gh, {tagNames: ['select']})
+      ),
+      h('select'),
+      'should ignore attributes for new elements'
+    )
+
+    st.deepEqual(
+      sanitize(
+        h('select', {autoComplete: true}),
+        merge(gh, {
+          tagNames: ['select'],
+          attributes: {select: ['autoComplete']}
+        })
+      ),
+      h('select', {autoComplete: true}),
+      'should support allowing attributes for new elements through the schema'
+    )
+
+    st.deepEqual(
+      sanitize(
+        h('div', [h('select', {form: 'one'}), h('select', {form: 'two'})]),
+        merge(gh, {
+          tagNames: ['select'],
+          attributes: {select: [['form', 'one']]}
+        })
+      ),
+      h('div', [h('select', {form: 'one'}), h('select')]),
+      'should support a list of valid values on new attributes'
+    )
+
+    st.deepEqual(
+      sanitize(
+        h('div', [
+          h('select', {form: 'alpha'}),
+          h('select', {form: 'bravo'}),
+          h('select', {}),
+          h('select', {form: false})
+        ]),
+        merge(gh, {
+          tagNames: ['select'],
+          attributes: {select: [['form', 'alpha']]},
+          required: {select: {form: 'alpha'}}
+        })
+      ),
+      h('div', [
+        h('select', {form: 'alpha'}),
+        h('select', {form: 'alpha'}),
+        h('select', {form: 'alpha'}),
+        h('select', {form: 'alpha'})
+      ]),
+      'should support required attributes'
+    )
+
     st.end()
   })
 

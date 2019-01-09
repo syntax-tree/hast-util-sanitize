@@ -136,6 +136,44 @@ properties.
 }
 ```
 
+Instead of a single string (such as `type`), which allows any value of that
+attribute, it’s also possible to provide an array (such as `['type',
+'checkbox']`), where the first entry is the key, and the other entries are
+allowed values of that property.
+
+This is how the default GitHub schema allows only disabled checkbox inputs:
+
+```js
+"attributes": {
+  // ...
+  "input": [
+    ["type", "checkbox"],
+    ["disabled", true]
+  ],
+  // ...
+}
+```
+
+###### `required`
+
+Map of tag-names to required attributes and their default values
+(`Object.<Object.<*>>`).
+If the properties in such a required attributes object do not exist on an
+element, they are added and set to the specified value.
+
+Note that properties are first checked based on the schema at `attributes`,
+so properties could be removed by that step and then added again through
+`required`.
+
+```js
+"required": {
+  "input": {
+    "type": "checkbox",
+    "disabled": true
+  }
+}
+```
+
 ###### `tagNames`
 
 List of allowed tag-names (`Array.<string>`).
