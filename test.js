@@ -1,6 +1,5 @@
 'use strict'
 
-/* Dependencies. */
 var test = require('tape')
 var html = require('hast-util-to-html')
 var h = require('hastscript')
@@ -12,7 +11,6 @@ var sanitize = require('.')
 
 /* eslint-disable no-script-url, max-params */
 
-/* Tests. */
 test('sanitize()', function(t) {
   t.test('non-node', function(st) {
     st.equal(html(sanitize(true)), '', 'should ignore non-nodes (#1)')
@@ -525,21 +523,21 @@ test('sanitize()', function(t) {
   t.end()
 })
 
-/* Coverage. */
+// Coverage.
 toString()
 
-/* Check */
+// Check.
 function toString() {
   return 'alert(1);'
 }
 
-/* Test `valid` and `invalid` `url`s in `prop` on `tagName`. */
+// Test `valid` and `invalid` `url`s in `prop` on `tagName`.
 function testAllURLs(t, tagName, prop, all) {
   testURLs(t, tagName, prop, all.valid, true)
   testURLs(t, tagName, prop, all.invalid, false)
 }
 
-/* Test `valid` `url`s in `prop` on `tagName`. */
+// Test `valid` `url`s in `prop` on `tagName`.
 function testURLs(t, tagName, prop, urls, valid) {
   Object.keys(urls).forEach(function(name) {
     var props = {}
