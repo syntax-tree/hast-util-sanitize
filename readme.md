@@ -243,7 +243,7 @@ List of allowed attribute-names which can clobber (`Array.<string>`).
 Prefix (`string`) to use before potentially clobbering properties.
 
 ```js
-"clobberPrefix": "user-content"
+"clobberPrefix": "user-content-"
 ```
 
 ###### `strip`
