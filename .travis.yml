@@ -1,7 +1,7 @@
 language: node_js
 node_js:
-- lts/boron
-- node
+  - lts/dubnium
+  - node
 after_script: bash <(curl -s https://codecov.io/bash)
 deploy:
   provider: releases
@@ -9,7 +9,7 @@ deploy:
   api_key:
     secure: jL05HgVf3iCKoMo+Gr623BQEhex5HF63ifPVkOprWjP4xXXh5ZA8b5NOMMN0lAyvOTRjYpRMzqzwt9HATZD1FSbiIzpQ4Q2VPwnkDC0RGm22/QGkOLj/HGg+gdhzqzkR2CymfJOPLvCPatr37GBBB1rvM3kZ9cOHA1m91ZbKOKcTM/DcRKNoveFDb/Naz8AsLmBaiMSLPNSPV8lkcDbBTBatP/6xzpa1Y++BEAkTizaXGJD5dhs7kBsbJ27+MPwHieqUfVx5k2yIGA/TKBnEPFkToq6EvTzAIn3QXEO2r6WBwAVN3cCRq8b0RnRI28JVoNuvpCji5Oa0vgdOhlRCZKHY8bwD+tyQ+tCPb67GnOIWB0glad8RCtEZyjQDCwBaqqVV+Ab/qiUAv9V5dTU5HyLewijHOXcHkEtVJ/XcwJaJQOPnEDXsukrhxXI3h84FiL3d+32IOCkrOHmX9ISPaC1y6hllbqJ6Fqiqmn+fJfJyaUluXiqNmDgF9FRc+PcmY89EeHlbsjH9WfWCH8X7ZGoRiHUSSw96CY1XwXsOqJO50CVN0RtG32yoqALbhHQFuU1+UocHvskC9v8hXPX6l1lPfYU+IYSleO59nq+/sQ9r5Nr9ybF1ybLtzk/N7yL62+wxXazo2jgJM3dpAjsckTPmnz5iokKZ32QDJNSSU10=
   file:
-    - "hast-util-sanitize.js"
-    - "hast-util-sanitize.min.js"
+    - 'hast-util-sanitize.js'
+    - 'hast-util-sanitize.min.js'
   on:
     tags: true
