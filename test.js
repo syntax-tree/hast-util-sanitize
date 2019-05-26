@@ -655,3 +655,5 @@ function testURLs(t, tagName, prop, urls, valid) {
     )
   })
 }
+
+/* eslint-enable no-script-url, max-params */
