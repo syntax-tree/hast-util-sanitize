@@ -127,12 +127,12 @@ One special value, namely `'data*'`, can be used to allow all `data` properties.
     "src",
     "longDesc"
   ],
-  // ...
+  // …
   "*": [
     "abbr",
     "accept",
     "acceptCharset",
-    // ...
+    // …
     "vspace",
     "width",
     "itemProp"
@@ -149,12 +149,12 @@ This is how the default GitHub schema allows only disabled checkbox inputs:
 
 ```js
 "attributes": {
-  // ...
+  // …
   "input": [
     ["type", "checkbox"],
     ["disabled", true]
   ],
-  // ...
+  // …
 }
 ```
 
@@ -187,7 +187,7 @@ List of allowed tag names (`Array.<string>`).
   "h1",
   "h2",
   "h3",
-  // ...
+  // …
   "strike",
   "summary",
   "details"
@@ -206,7 +206,7 @@ Map of protocols to allow in [*property values*][value]
     "https",
     "mailto"
   ],
-  // ...
+  // …
   "longDesc": [
     "http",
     "https"
@@ -225,7 +225,7 @@ Map of tag names to their required [*ancestor*][ancestor] [*elements*][element]
     "ol",
     "ul"
   ],
-  // ...
+  // …
   "tr": [
     "table"
   ]
