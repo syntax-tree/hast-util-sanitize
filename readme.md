@@ -88,7 +88,7 @@ Sanitize a [**hast**][hast] [*tree*][tree].
 
 Configuration.
 If not given, defaults to [GitHub][] style sanitation.
-If any top-level key isn’t given, it defaults to GH’s style too.
+If any top-level key isn’t given, it defaults to GitHub’s style too.
 
 For a thorough sample, see [`github.json`][schema-github].
 
