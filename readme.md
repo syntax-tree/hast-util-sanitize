@@ -3,25 +3,28 @@
 [![Build][build-badge]][build]
 [![Coverage][coverage-badge]][coverage]
 [![Downloads][downloads-badge]][downloads]
+[![Size][size-badge]][size]
+[![Sponsors][sponsors-badge]][collective]
+[![Backers][backers-badge]][collective]
 [![Chat][chat-badge]][chat]
 
-Sanitize [HAST][].
+[**hast**][hast] utility to sanitize a [*tree*][tree].
 
-## Installation
+## Install
 
 [npm][]:
 
-```bash
+```sh
 npm install hast-util-sanitize
 ```
 
 ## Usage
 
-```javascript
+```js
 var h = require('hastscript')
 var u = require('unist-builder')
 var sanitize = require('hast-util-sanitize')
-var toHTML = require('hast-util-to-html')
+var toHtml = require('hast-util-to-html')
 
 var tree = h('div', {onmouseover: 'alert("alpha")'}, [
   h(
@@ -39,8 +42,8 @@ var tree = h('div', {onmouseover: 'alert("alpha")'}, [
   h('math', h('mi', {'xlink:href': 'data:x,<script>alert("foxtrot")</script>'}))
 ])
 
-var unsanitized = toHTML(tree)
-var sanitized = toHTML(sanitize(tree))
+var unsanitized = toHtml(tree)
+var sanitized = toHtml(sanitize(tree))
 
 console.log(unsanitized)
 console.log(sanitized)
@@ -68,28 +71,28 @@ Sanitized:
 
 ## API
 
-### `sanitize(node[, schema])`
+### `sanitize(tree[, schema])`
 
-Sanitize the given [HAST][] tree.
+Sanitize a [**hast**][hast] [*tree*][tree].
 
 ###### Parameters
 
-*   `node` ([`HASTNode`][hast]).
-*   `schema` ([`Schema`][schema], optional).
+*   `tree` ([`Node`][node]) — [*Tree*][tree] to sanitize
+*   `schema` ([`Schema`][schema], optional) — Schema defining how to sanitize
 
 ###### Returns
 
-[`HASTNode`][hast] — A new node.
+[`Node`][node] — A new, sanitized [*tree*][tree].
 
 ### `Schema`
 
-Configuration.  If not given, defaults to [GitHub][] style sanitation.
+Configuration.
+If not given, defaults to [GitHub][] style sanitation.
 If any top-level key isn’t given, it defaults to GH’s style too.
 
-For a thorough sample, see the packages [`github.json`][schema-github].
+For a thorough sample, see [`github.json`][schema-github].
 
-To extend the standard schema with a few changes, clone `github.json`
-like so:
+To extend the standard schema with a few changes, clone `github.json` like so:
 
 ```js
 var h = require('hastscript')
@@ -107,12 +110,13 @@ console.log(tree)
 
 ###### `attributes`
 
-Map of tag-names to allowed attributes (`Object.<Array.<string>>`).
+Map of tag names to allowed [*property names*][name]
+(`Object.<Array.<string>>`).
 
-The special `'*'` key sets attributes allowed on all elements.
+The special `'*'` key defines [*property names*][name] allowed on all
+[*elements*][element].
 
-One special value, namely `'data*'`, can be used to allow all `data`
-properties.
+One special value, namely `'data*'`, can be used to allow all `data` properties.
 
 ```js
 "attributes": {
@@ -136,10 +140,10 @@ properties.
 }
 ```
 
-Instead of a single string (such as `type`), which allows any value of that
-attribute, it’s also possible to provide an array (such as `['type',
-'checkbox']`), where the first entry is the key, and the other entries are
-allowed values of that property.
+Instead of a single string (such as `type`), which allows any [*property
+value*][value] of that [*property name*][name], it’s also possible to provide
+an array (such as `['type', 'checkbox']`), where the first entry is the
+*propery name*, and the other entries are allowed *property values*.
 
 This is how the default GitHub schema allows only disabled checkbox inputs:
 
@@ -156,13 +160,13 @@ This is how the default GitHub schema allows only disabled checkbox inputs:
 
 ###### `required`
 
-Map of tag-names to required attributes and their default values
-(`Object.<Object.<*>>`).
-If the properties in such a required attributes object do not exist on an
-element, they are added and set to the specified value.
+Map of tag names to required [*property names*][name] and their default
+[*property value*][value] (`Object.<Object.<*>>`).
+If the defined keys do not exist in an [*element*][element]’s
+[*properties*][properties], they are added and set to the specified value.
 
 Note that properties are first checked based on the schema at `attributes`,
-so properties could be removed by that step and then added again through
+so *properties* could be removed by that step and then added again through
 `required`.
 
 ```js
@@ -176,7 +180,7 @@ so properties could be removed by that step and then added again through
 
 ###### `tagNames`
 
-List of allowed tag-names (`Array.<string>`).
+List of allowed tag names (`Array.<string>`).
 
 ```js
 "tagNames": [
@@ -192,7 +196,8 @@ List of allowed tag-names (`Array.<string>`).
 
 ###### `protocols`
 
-Map of protocols to support for attributes (`Object.<Array.<string>>`).
+Map of protocols to allow in [*property values*][value]
+(`Object.<Array.<string>>`).
 
 ```js
 "protocols": {
@@ -211,7 +216,7 @@ Map of protocols to support for attributes (`Object.<Array.<string>>`).
 
 ###### `ancestors`
 
-Map of tag-names to their required ancestral elements
+Map of tag names to their required [*ancestor*][ancestor] [*elements*][element]
 (`Object.<Array.<string>>`).
 
 ```js
@@ -229,7 +234,7 @@ Map of tag-names to their required ancestral elements
 
 ###### `clobber`
 
-List of allowed attribute-names which can clobber (`Array.<string>`).
+List of allowed [*property names*][name] which can clobber (`Array.<string>`).
 
 ```js
 "clobber": [
@@ -240,7 +245,7 @@ List of allowed attribute-names which can clobber (`Array.<string>`).
 
 ###### `clobberPrefix`
 
-Prefix (`string`) to use before potentially clobbering properties.
+Prefix to use before potentially clobbering [*property names*][name] (`string`).
 
 ```js
 "clobberPrefix": "user-content-"
@@ -248,10 +253,11 @@ Prefix (`string`) to use before potentially clobbering properties.
 
 ###### `strip`
 
-Tag-names to strip from the tree (`Array.<string>`).
+Names of [*elements*][element] to strip from the [*tree*][tree]
+(`Array.<string>`).
 
-By default, unsafe elements are replaced by their content.  Some elements,
-should however be entirely stripped from the tree.
+By default, unsafe *elements* are replaced by their [*children*][child].
+Some *elements*, should however be entirely stripped from the *tree*.
 
 ```js
 "strip": [
@@ -261,7 +267,7 @@ should however be entirely stripped from the tree.
 
 ###### `allowComments`
 
-Whether to allow comment nodes (`boolean`, default: `false`).
+Whether to allow [*comments*][comment] (`boolean`, default: `false`).
 
 ```js
 "allowComments": true
@@ -269,7 +275,7 @@ Whether to allow comment nodes (`boolean`, default: `false`).
 
 ###### `allowDoctypes`
 
-Whether to allow doctype nodes (`boolean`, default: `false`).
+Whether to allow [*doctypes*][doctype] (`boolean`, default: `false`).
 
 ```js
 "allowDoctypes": true
@@ -277,11 +283,13 @@ Whether to allow doctype nodes (`boolean`, default: `false`).
 
 ## Contribute
 
-See [`contributing.md` in `syntax-tree/hast`][contributing] for ways to get
+See [`contributing.md` in `syntax-tree/.github`][contributing] for ways to get
 started.
+See [`support.md`][support] for ways to get help.
 
-This organisation has a [Code of Conduct][coc].  By interacting with this
-repository, organisation, or community you agree to abide by its terms.
+This project has a [Code of Conduct][coc].
+By interacting with this repository, organisation, or community you agree to
+abide by its terms.
 
 ## License
 
@@ -301,9 +309,19 @@ repository, organisation, or community you agree to abide by its terms.
 
 [downloads]: https://www.npmjs.com/package/hast-util-sanitize
 
+[size-badge]: https://img.shields.io/bundlephobia/minzip/hast-util-sanitize.svg
+
+[size]: https://bundlephobia.com/result?p=hast-util-sanitize
+
+[sponsors-badge]: https://opencollective.com/unified/sponsors/badge.svg
+
+[backers-badge]: https://opencollective.com/unified/backers/badge.svg
+
+[collective]: https://opencollective.com/unified
+
 [chat-badge]: https://img.shields.io/badge/join%20the%20community-on%20spectrum-7b16ff.svg
 
-[chat]: https://spectrum.chat/unified/rehype
+[chat]: https://spectrum.chat/unified/syntax-tree
 
 [npm]: https://docs.npmjs.com/cli/install
 
@@ -311,14 +329,36 @@ repository, organisation, or community you agree to abide by its terms.
 
 [author]: https://wooorm.com
 
+[contributing]: https://github.com/syntax-tree/.github/blob/master/contributing.md
+
+[support]: https://github.com/syntax-tree/.github/blob/master/support.md
+
+[coc]: https://github.com/syntax-tree/.github/blob/master/code-of-conduct.md
+
+[tree]: https://github.com/syntax-tree/unist#tree
+
+[child]: https://github.com/syntax-tree/unist#child
+
+[ancestor]: https://github.com/syntax-tree/unist#ancestor
+
 [hast]: https://github.com/syntax-tree/hast
 
-[schema]: #schema
+[node]: https://github.com/syntax-tree/hast#nodes
+
+[element]: https://github.com/syntax-tree/hast#element
+
+[doctype]: https://github.com/syntax-tree/hast#doctype
+
+[comment]: https://github.com/syntax-tree/hast#comment
+
+[properties]: https://github.com/syntax-tree/hast#properties
+
+[name]: https://github.com/syntax-tree/hast#propertyname
+
+[value]: https://github.com/syntax-tree/hast#propertyvalue
 
 [github]: https://github.com/jch/html-pipeline/blob/master/lib/html/pipeline/sanitization_filter.rb
 
 [schema-github]: lib/github.json
 
-[contributing]: https://github.com/syntax-tree/hast/blob/master/contributing.md
-
-[coc]: https://github.com/syntax-tree/hast/blob/master/code-of-conduct.md
+[schema]: #schema
