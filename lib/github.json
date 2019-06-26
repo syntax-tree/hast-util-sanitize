@@ -35,7 +35,10 @@
     "href": [
       "http",
       "https",
-      "mailto"
+      "mailto",
+      "xmpp",
+      "irc",
+      "ircs"
     ],
     "cite": [
       "http",
@@ -101,6 +104,18 @@
     "strike",
     "summary",
     "details",
+    "caption",
+    "figure",
+    "figcaption",
+    "abbr",
+    "bdo",
+    "cite",
+    "dfn",
+    "mark",
+    "small",
+    "span",
+    "time",
+    "wbr",
     "input"
   ],
   "attributes": {
@@ -142,6 +157,10 @@
       "action",
       "align",
       "alt",
+      "ariaDescribedBy",
+      "ariaHidden",
+      "ariaLabel",
+      "ariaLabelledBy",
       "axis",
       "border",
       "cellPadding",
