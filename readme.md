@@ -133,7 +133,7 @@ One special value, namely `'data*'`, can be used to allow all `data` properties.
     "accept",
     "acceptCharset",
     // …
-    "vspace",
+    "vSpace",
     "width",
     "itemProp"
   ]
@@ -281,6 +281,15 @@ Whether to allow [*doctypes*][doctype] (`boolean`, default: `false`).
 "allowDoctypes": true
 ```
 
+## Security
+
+Improper use of `hast-util-sanitize` can open you up to a
+[cross-site scripting (XSS)][xss] attack.
+The defaults *are* safe, but deviating from them is likely *unsafe*.
+
+Use `hast-util-sanitize` *after* all other utilities, as other utilities are
+likely also unsafe.
+
 ## Contribute
 
 See [`contributing.md` in `syntax-tree/.github`][contributing] for ways to get
@@ -358,6 +367,8 @@ abide by its terms.
 [value]: https://github.com/syntax-tree/hast#propertyvalue
 
 [github]: https://github.com/jch/html-pipeline/blob/master/lib/html/pipeline/sanitization_filter.rb
+
+[xss]: https://en.wikipedia.org/wiki/Cross-site_scripting
 
 [schema-github]: lib/github.json
 
