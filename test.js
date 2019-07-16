@@ -68,6 +68,22 @@ test('sanitize()', function(t) {
       'should allow `comment`s with `allowComments: true`'
     )
 
+    st.equal(
+      html(sanitize(u('comment', {toString: toString}), {allowComments: true})),
+      '<!---->',
+      'should ignore non-string `value`s with `allowComments: true`'
+    )
+
+    st.equal(
+      html(
+        sanitize(u('comment', 'alpha--><script>alert(1)</script><!--bravo'), {
+          allowComments: true
+        })
+      ),
+      '<!--alpha-->',
+      'should not break out of comments with `allowComments: true`'
+    )
+
     st.end()
   })
 
