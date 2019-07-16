@@ -360,6 +360,7 @@ test('sanitize()', function(t) {
         },
         invalid: {
           javascript: 'javascript:alert(1)',
+          whitespace: ' javascript:while(1){}',
           'Unicode LS/PS I': '\u2028javascript:alert(1)',
           'Unicode Whitespace (#1)': ' javascript:alert(1)',
           'Unicode Whitespace (#2)': ' javascript:alert(1)',
