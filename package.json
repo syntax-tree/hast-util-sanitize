@@ -1,11 +1,18 @@
 {
   "name": "hast-util-sanitize",
   "version": "2.0.1",
-  "description": "Sanitize hast nodes",
+  "description": "hast utility to sanitize nodes",
   "license": "MIT",
   "keywords": [
+    "unist",
     "hast",
+    "hast-util",
     "util",
+    "utility",
+    "html",
+    "clean",
+    "xss",
+    "safe",
     "sanitize"
   ],
   "repository": "syntax-tree/hast-util-sanitize",
