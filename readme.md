@@ -290,6 +290,11 @@ The defaults *are* safe, but deviating from them is likely *unsafe*.
 Use `hast-util-sanitize` *after* all other utilities, as other utilities are
 likely also unsafe.
 
+## Related
+
+*   [`rehype-sanitize`](https://github.com/rehypejs/rehype-sanitize)
+    — [rehype](https://github.com/rehypejs/rehype) plugin wrapper
+
 ## Contribute
 
 See [`contributing.md` in `syntax-tree/.github`][contributing] for ways to get
