@@ -11,8 +11,8 @@ var sanitize = require('.')
 
 /* eslint-disable no-script-url, max-params */
 
-test('sanitize()', function(t) {
-  t.test('non-node', function(st) {
+test('sanitize()', function (t) {
+  t.test('non-node', function (st) {
     st.equal(html(sanitize(true)), '', 'should ignore non-nodes (#1)')
     st.equal(html(sanitize(null)), '', 'should ignore non-nodes (#2)')
     st.equal(html(sanitize(1)), '', 'should ignore non-nodes (#3)')
@@ -21,7 +21,7 @@ test('sanitize()', function(t) {
     st.end()
   })
 
-  t.test('unknown nodes', function(st) {
+  t.test('unknown nodes', function (st) {
     st.equal(
       html(sanitize(u('unknown', '<xml></xml>'))),
       '',
@@ -31,7 +31,7 @@ test('sanitize()', function(t) {
     st.end()
   })
 
-  t.test('ignored nodes', function(st) {
+  t.test('ignored nodes', function (st) {
     st.equal(html(sanitize(u('raw', '<xml></xml>'))), '', 'should ignore `raw`')
 
     st.equal(
@@ -55,7 +55,7 @@ test('sanitize()', function(t) {
     st.end()
   })
 
-  t.test('`comment`', function(st) {
+  t.test('`comment`', function (st) {
     st.equal(
       html(sanitize(u('comment', 'alpha'))),
       '',
@@ -87,7 +87,7 @@ test('sanitize()', function(t) {
     st.end()
   })
 
-  t.test('`doctype`', function(st) {
+  t.test('`doctype`', function (st) {
     st.equal(
       html(sanitize(u('doctype', {name: 'html'}, 'alpha'))),
       '',
@@ -105,7 +105,7 @@ test('sanitize()', function(t) {
     st.end()
   })
 
-  t.test('`text`', function(st) {
+  t.test('`text`', function (st) {
     st.deepEqual(
       sanitize({
         type: 'text',
@@ -159,7 +159,7 @@ test('sanitize()', function(t) {
     st.end()
   })
 
-  t.test('`element`', function(st) {
+  t.test('`element`', function (st) {
     st.deepEqual(
       sanitize({
         type: 'element',
@@ -346,7 +346,7 @@ test('sanitize()', function(t) {
       'should ignore `svg` elements'
     )
 
-    st.test('href`', function(sst) {
+    st.test('href`', function (sst) {
       testAllURLs(sst, 'a', 'href', {
         valid: {
           anchor: '#heading',
@@ -372,7 +372,7 @@ test('sanitize()', function(t) {
       sst.end()
     })
 
-    st.test('`cite`', function(sst) {
+    st.test('`cite`', function (sst) {
       testAllURLs(sst, 'blockquote', 'cite', {
         valid: {
           anchor: '#heading',
@@ -397,7 +397,7 @@ test('sanitize()', function(t) {
       sst.end()
     })
 
-    st.test('`src`', function(sst) {
+    st.test('`src`', function (sst) {
       testAllURLs(sst, 'img', 'src', {
         valid: {
           anchor: '#heading',
@@ -422,7 +422,7 @@ test('sanitize()', function(t) {
       sst.end()
     })
 
-    st.test('`longDesc`', function(sst) {
+    st.test('`longDesc`', function (sst) {
       testAllURLs(sst, 'img', 'longDesc', {
         valid: {
           anchor: '#heading',
@@ -447,7 +447,7 @@ test('sanitize()', function(t) {
       sst.end()
     })
 
-    st.test('`li`', function(sst) {
+    st.test('`li`', function (sst) {
       sst.deepEqual(
         sanitize(h('li', 'alert(1)')),
         u('text', 'alert(1)'),
@@ -480,8 +480,8 @@ test('sanitize()', function(t) {
 
       sst.end()
     })
-    ;['tr', 'td', 'th', 'tbody', 'thead', 'tfoot'].forEach(function(name) {
-      st.test('`' + name + '`', function(sst) {
+    ;['tr', 'td', 'th', 'tbody', 'thead', 'tfoot'].forEach(function (name) {
+      st.test('`' + name + '`', function (sst) {
         sst.deepEqual(
           sanitize(h(name, 'alert(1)')),
           u('text', 'alert(1)'),
@@ -611,7 +611,7 @@ test('sanitize()', function(t) {
     st.end()
   })
 
-  t.test('`root`', function(st) {
+  t.test('`root`', function (st) {
     st.deepEqual(
       sanitize({
         type: 'root',
@@ -660,7 +660,7 @@ function testAllURLs(t, tagName, prop, all) {
 
 // Test `valid` `url`s in `prop` on `tagName`.
 function testURLs(t, tagName, prop, urls, valid) {
-  Object.keys(urls).forEach(function(name) {
+  Object.keys(urls).forEach(function (name) {
     var props = {}
 
     props[prop] = urls[name]
