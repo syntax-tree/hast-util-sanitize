@@ -448,10 +448,11 @@ test('sanitize()', function (t) {
     })
 
     st.test('`li`', function (sst) {
+
       sst.deepEqual(
         sanitize(h('li', 'alert(1)')),
-        u('text', 'alert(1)'),
-        'should not allow `li` outside list'
+        h('li', 'alert(1)'),
+        'should allow `li` outside list'
       )
 
       sst.deepEqual(
