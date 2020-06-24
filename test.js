@@ -12,69 +12,69 @@ var sanitize = require('.')
 /* eslint-disable no-script-url, max-params */
 
 test('sanitize()', function (t) {
-  t.test('non-node', function (st) {
-    st.equal(html(sanitize(true)), '', 'should ignore non-nodes (#1)')
-    st.equal(html(sanitize(null)), '', 'should ignore non-nodes (#2)')
-    st.equal(html(sanitize(1)), '', 'should ignore non-nodes (#3)')
-    st.equal(html(sanitize([])), '', 'should ignore non-nodes (#4)')
+  t.test('non-node', function (t) {
+    t.equal(html(sanitize(true)), '', 'should ignore non-nodes (#1)')
+    t.equal(html(sanitize(null)), '', 'should ignore non-nodes (#2)')
+    t.equal(html(sanitize(1)), '', 'should ignore non-nodes (#3)')
+    t.equal(html(sanitize([])), '', 'should ignore non-nodes (#4)')
 
-    st.end()
+    t.end()
   })
 
-  t.test('unknown nodes', function (st) {
-    st.equal(
+  t.test('unknown nodes', function (t) {
+    t.equal(
       html(sanitize(u('unknown', '<xml></xml>'))),
       '',
       'should ignore unknown nodes'
     )
 
-    st.end()
+    t.end()
   })
 
-  t.test('ignored nodes', function (st) {
-    st.equal(html(sanitize(u('raw', '<xml></xml>'))), '', 'should ignore `raw`')
+  t.test('ignored nodes', function (t) {
+    t.equal(html(sanitize(u('raw', '<xml></xml>'))), '', 'should ignore `raw`')
 
-    st.equal(
+    t.equal(
       html(sanitize(u('directive', {name: '!alpha'}, '!alpha bravo'))),
       '',
       'should ignore declaration `directive`s'
     )
 
-    st.equal(
+    t.equal(
       html(sanitize(u('directive', {name: '?xml'}, '?xml version="1.0"'))),
       '',
       'should ignore processing instruction `directive`s'
     )
 
-    st.equal(
+    t.equal(
       html(sanitize(u('characterData', 'alpha'))),
       '',
       'should ignore `characterData`s'
     )
 
-    st.end()
+    t.end()
   })
 
-  t.test('`comment`', function (st) {
-    st.equal(
+  t.test('`comment`', function (t) {
+    t.equal(
       html(sanitize(u('comment', 'alpha'))),
       '',
       'should ignore `comment`s by default'
     )
 
-    st.equal(
+    t.equal(
       html(sanitize(u('comment', 'alpha'), {allowComments: true})),
       '<!--alpha-->',
       'should allow `comment`s with `allowComments: true`'
     )
 
-    st.equal(
+    t.equal(
       html(sanitize(u('comment', {toString: toString}), {allowComments: true})),
       '<!---->',
       'should ignore non-string `value`s with `allowComments: true`'
     )
 
-    st.equal(
+    t.equal(
       html(
         sanitize(u('comment', 'alpha--><script>alert(1)</script><!--bravo'), {
           allowComments: true
@@ -84,17 +84,17 @@ test('sanitize()', function (t) {
       'should not break out of comments with `allowComments: true`'
     )
 
-    st.end()
+    t.end()
   })
 
-  t.test('`doctype`', function (st) {
-    st.equal(
+  t.test('`doctype`', function (t) {
+    t.equal(
       html(sanitize(u('doctype', {name: 'html'}, 'alpha'))),
       '',
       'should ignore `doctype`s by default'
     )
 
-    st.equal(
+    t.equal(
       html(
         sanitize(u('doctype', {name: 'html'}, 'alpha'), {allowDoctypes: true})
       ),
@@ -102,11 +102,11 @@ test('sanitize()', function (t) {
       'should allow `doctype`s with `allowDoctypes: true`'
     )
 
-    st.end()
+    t.end()
   })
 
-  t.test('`text`', function (st) {
-    st.deepEqual(
+  t.test('`text`', function (t) {
+    t.deepEqual(
       sanitize({
         type: 'text',
         tagName: 'div',
@@ -132,35 +132,35 @@ test('sanitize()', function (t) {
       'should allow known properties'
     )
 
-    st.equal(
+    t.equal(
       html(sanitize(u('text', 'alert(1)'))),
       'alert(1)',
       'should allow `text`'
     )
 
-    st.equal(
+    t.equal(
       html(sanitize(u('text', {toString: toString}))),
       '',
       'should ignore non-string `value`s'
     )
 
-    st.equal(
+    t.equal(
       html(sanitize(h('script', u('text', 'alert(1)')))),
       '',
       'should ignore `text` in `script` elements'
     )
 
-    st.equal(
+    t.equal(
       html(sanitize(h('style', u('text', 'alert(1)')))),
       'alert(1)',
       'should show `text` in `style` elements'
     )
 
-    st.end()
+    t.end()
   })
 
-  t.test('`element`', function (st) {
-    st.deepEqual(
+  t.test('`element`', function (t) {
+    t.deepEqual(
       sanitize({
         type: 'element',
         tagName: 'div',
@@ -188,13 +188,13 @@ test('sanitize()', function (t) {
       'should allow known properties'
     )
 
-    st.deepEqual(
+    t.deepEqual(
       sanitize(h('unknown', u('text', 'alert(1)'))),
       u('text', 'alert(1)'),
       'should ignore unknown elements'
     )
 
-    st.deepEqual(
+    t.deepEqual(
       sanitize({
         type: 'element',
         properties: {},
@@ -204,73 +204,73 @@ test('sanitize()', function (t) {
       'should ignore elements without name'
     )
 
-    st.deepEqual(
+    t.deepEqual(
       sanitize({type: 'element', tagName: 'div'}),
       h(),
       'should support elements without children / properties'
     )
 
-    st.deepEqual(
+    t.deepEqual(
       sanitize(h('unknown', [])),
       u('root', []),
       'should always return a valid node (#1)'
     )
 
-    st.deepEqual(
+    t.deepEqual(
       sanitize(h('script', [])),
       u('root', []),
       'should always return a valid node (#2)'
     )
 
-    st.deepEqual(
+    t.deepEqual(
       sanitize(h('div', h('style', [u('text', '1'), u('text', '2')]))),
       h('div', [u('text', '1'), u('text', '2')]),
       'should always return a valid node (#3)'
     )
 
-    st.deepEqual(
+    t.deepEqual(
       sanitize(h('unknown', [u('text', 'value')])),
       u('text', 'value'),
       'should always return a valid node (#4)'
     )
 
-    st.deepEqual(
+    t.deepEqual(
       sanitize(h('unknown', [u('text', '1'), u('text', '2')])),
       u('root', [u('text', '1'), u('text', '2')]),
       'should always return a valid node (#5)'
     )
 
-    st.deepEqual(
+    t.deepEqual(
       sanitize(h('div', {alt: 'alpha'})),
       h('div', {alt: 'alpha'}),
       'should allow known generic properties'
     )
 
-    st.deepEqual(
+    t.deepEqual(
       sanitize(h('a', {href: '#heading'})),
       h('a', {href: '#heading'}),
       'should allow specific properties'
     )
 
-    st.deepEqual(
+    t.deepEqual(
       sanitize(h('img', {href: '#heading'})),
       h('img'),
       'should ignore mismatched specific properties'
     )
 
-    st.deepEqual(
+    t.deepEqual(
       sanitize(h('div', {dataFoo: 'bar'})),
       h('div'),
       'should ignore unspecified properties'
     )
 
-    st.deepEqual(
+    t.deepEqual(
       sanitize(h('div', {dataFoo: 'bar'})),
       h('div'),
       'should ignore unspecified properties'
     )
 
-    st.deepEqual(
+    t.deepEqual(
       sanitize(
         h('div', {dataFoo: 'bar'}),
         merge(gh, {attributes: {'*': ['data*']}})
@@ -279,49 +279,49 @@ test('sanitize()', function (t) {
       'should allow `data*`'
     )
 
-    st.deepEqual(
+    t.deepEqual(
       sanitize(h('img', {alt: 'hello'})),
       h('img', {alt: 'hello'}),
       'should allow `string`s'
     )
 
-    st.deepEqual(
+    t.deepEqual(
       sanitize(h('img', {alt: true})),
       h('img', {alt: true}),
       'should allow `boolean`s'
     )
 
-    st.deepEqual(
+    t.deepEqual(
       sanitize(h('img', {alt: 1})),
       h('img', {alt: 1}),
       'should allow `number`s'
     )
 
-    st.deepEqual(
+    t.deepEqual(
       sanitize(u('element', {tagName: 'img', properties: {alt: null}})),
       h('img'),
       'should ignore `null`'
     )
 
-    st.deepEqual(
+    t.deepEqual(
       sanitize(u('element', {tagName: 'img', properties: {alt: undefined}})),
       h('img'),
       'should ignore `undefined`'
     )
 
-    st.deepEqual(
+    t.deepEqual(
       sanitize(h('div', {id: 'getElementById'})),
       h('div', {id: 'user-content-getElementById'}),
       'should prevent clobbering (#1)'
     )
 
-    st.deepEqual(
+    t.deepEqual(
       sanitize(h('div', {name: 'getElementById'})),
       h('div', {name: 'user-content-getElementById'}),
       'should prevent clobbering (#2)'
     )
 
-    st.deepEqual(
+    t.deepEqual(
       sanitize(
         u('element', {tagName: 'img', properties: {alt: {toString: toString}}})
       ),
@@ -329,7 +329,7 @@ test('sanitize()', function (t) {
       'should ignore objects'
     )
 
-    st.deepEqual(
+    t.deepEqual(
       sanitize(
         u('element', {
           tagName: 'img',
@@ -340,14 +340,14 @@ test('sanitize()', function (t) {
       'should supports arrays'
     )
 
-    st.deepEqual(
+    t.deepEqual(
       sanitize(s('svg', {viewBox: '0 0 50 50'}, '!')),
       u('text', '!'),
       'should ignore `svg` elements'
     )
 
-    st.test('href`', function (sst) {
-      testAllURLs(sst, 'a', 'href', {
+    t.test('href`', function (t) {
+      testAllURLs(t, 'a', 'href', {
         valid: {
           anchor: '#heading',
           relative: '/file.html',
@@ -369,11 +369,11 @@ test('sanitize()', function (t) {
         }
       })
 
-      sst.end()
+      t.end()
     })
 
-    st.test('`cite`', function (sst) {
-      testAllURLs(sst, 'blockquote', 'cite', {
+    t.test('`cite`', function (t) {
+      testAllURLs(t, 'blockquote', 'cite', {
         valid: {
           anchor: '#heading',
           relative: '/file.html',
@@ -394,11 +394,11 @@ test('sanitize()', function (t) {
         }
       })
 
-      sst.end()
+      t.end()
     })
 
-    st.test('`src`', function (sst) {
-      testAllURLs(sst, 'img', 'src', {
+    t.test('`src`', function (t) {
+      testAllURLs(t, 'img', 'src', {
         valid: {
           anchor: '#heading',
           relative: '/file.html',
@@ -419,11 +419,11 @@ test('sanitize()', function (t) {
         }
       })
 
-      sst.end()
+      t.end()
     })
 
-    st.test('`longDesc`', function (sst) {
-      testAllURLs(sst, 'img', 'longDesc', {
+    t.test('`longDesc`', function (t) {
+      testAllURLs(t, 'img', 'longDesc', {
         valid: {
           anchor: '#heading',
           relative: '/file.html',
@@ -444,116 +444,115 @@ test('sanitize()', function (t) {
         }
       })
 
-      sst.end()
+      t.end()
     })
 
-    st.test('`li`', function (sst) {
-
-      sst.deepEqual(
+    t.test('`li`', function (t) {
+      t.deepEqual(
         sanitize(h('li', 'alert(1)')),
         h('li', 'alert(1)'),
         'should allow `li` outside list'
       )
 
-      sst.deepEqual(
+      t.deepEqual(
         sanitize(h('ol', h('li', 'alert(1)'))),
         h('ol', h('li', 'alert(1)')),
         'should allow `li` in `ol`'
       )
 
-      sst.deepEqual(
+      t.deepEqual(
         sanitize(h('ul', h('li', 'alert(1)'))),
         h('ul', h('li', 'alert(1)')),
         'should allow `li` in `ul`'
       )
 
-      sst.deepEqual(
+      t.deepEqual(
         sanitize(h('ol', h('div', h('li', 'alert(1)')))),
         h('ol', h('div', h('li', 'alert(1)'))),
         'should allow `li` descendant `ol`'
       )
 
-      sst.deepEqual(
+      t.deepEqual(
         sanitize(h('ul', h('div', h('li', 'alert(1)')))),
         h('ul', h('div', h('li', 'alert(1)'))),
         'should allow `li` descendant `ul`'
       )
 
-      sst.end()
+      t.end()
     })
     ;['tr', 'td', 'th', 'tbody', 'thead', 'tfoot'].forEach(function (name) {
-      st.test('`' + name + '`', function (sst) {
-        sst.deepEqual(
+      t.test('`' + name + '`', function (t) {
+        t.deepEqual(
           sanitize(h(name, 'alert(1)')),
           u('text', 'alert(1)'),
           'should not allow `' + name + '` outside `table`'
         )
 
-        sst.deepEqual(
+        t.deepEqual(
           sanitize(h('table', h(name, 'alert(1)'))),
           h('table', h(name, 'alert(1)')),
           'should allow `' + name + '` in `table`'
         )
 
-        sst.deepEqual(
+        t.deepEqual(
           sanitize(h('table', h('div', h(name, 'alert(1)')))),
           h('table', h('div', h(name, 'alert(1)'))),
           'should allow `' + name + '` descendant `table`'
         )
 
-        sst.end()
+        t.end()
       })
     })
 
-    st.deepEqual(
+    t.deepEqual(
       sanitize(h('input')),
       h('input', {type: 'checkbox', disabled: true}),
       'should allow only disabled checkbox inputs'
     )
 
-    st.deepEqual(
+    t.deepEqual(
       sanitize(h('input', {type: 'text'})),
       h('input', {type: 'checkbox', disabled: true}),
       'should not allow text inputs'
     )
 
-    st.deepEqual(
+    t.deepEqual(
       sanitize(h('input', {type: 'checkbox', disabled: false})),
       h('input', {type: 'checkbox', disabled: true}),
       'should not allow enabled inputs'
     )
 
-    st.deepEqual(
+    t.deepEqual(
       sanitize(h('ol', [h('li')])),
       h('ol', [h('li')]),
       'should allow list items'
     )
 
-    st.deepEqual(
+    t.deepEqual(
       sanitize(h('ol', [h('li', {className: ['foo', 'bar']})])),
       h('ol', [h('li', {className: []})]),
       'should not allow classes on list items'
     )
 
-    st.deepEqual(
+    t.deepEqual(
       sanitize(h('ol', [h('li', {className: ['foo', 'task-list-item']})])),
       h('ol', [h('li', {className: ['task-list-item']})]),
       'should only allow `task-list-item` as a class on list items'
     )
 
-    st.deepEqual(
+    t.deepEqual(
       sanitize(h('select')),
       u('root', []),
       'should ignore some elements by default'
     )
 
-    st.deepEqual(
+    t.deepEqual(
       sanitize(h('select'), merge(gh, {tagNames: ['select']})),
       h('select'),
       'should support allowing elements through the schema'
     )
 
-    st.deepEqual(
+    t.deepEqual(
       sanitize(
         h('select', {autoComplete: true}),
         merge(gh, {tagNames: ['select']})
@@ -562,7 +561,7 @@ test('sanitize()', function (t) {
       'should ignore attributes for new elements'
     )
 
-    st.deepEqual(
+    t.deepEqual(
       sanitize(
         h('select', {autoComplete: true}),
         merge(gh, {
@@ -574,7 +573,7 @@ test('sanitize()', function (t) {
       'should support allowing attributes for new elements through the schema'
     )
 
-    st.deepEqual(
+    t.deepEqual(
       sanitize(
         h('div', [h('select', {form: 'one'}), h('select', {form: 'two'})]),
         merge(gh, {
@@ -586,7 +585,7 @@ test('sanitize()', function (t) {
       'should support a list of valid values on new attributes'
     )
 
-    st.deepEqual(
+    t.deepEqual(
       sanitize(
         h('div', [
           h('select', {form: 'alpha'}),
@@ -609,11 +608,11 @@ test('sanitize()', function (t) {
       'should support required attributes'
     )
 
-    st.end()
+    t.end()
   })
 
-  t.test('`root`', function (st) {
-    st.deepEqual(
+  t.test('`root`', function (t) {
+    t.deepEqual(
       sanitize({
         type: 'root',
         tagName: 'div',
@@ -639,7 +638,7 @@ test('sanitize()', function (t) {
       'should allow known properties'
     )
 
-    st.end()
+    t.end()
   })
 
   t.end()
