@@ -26,7 +26,9 @@
     "Titus Wormer <tituswormer@gmail.com> (https://wooorm.com)",
     "Jason Switzer <jswitzer@gmail.com>"
   ],
+  "types": "types/index.d.ts",
   "files": [
+    "types/index.d.ts",
     "lib",
     "index.js"
   ],
@@ -36,8 +38,9 @@
   "devDependencies": {
     "browserify": "^16.0.0",
     "deepmerge": "^4.0.0",
+    "dtslint": "^3.6.12",
     "hast-util-to-html": "^7.0.0",
-    "hastscript": "^5.0.0",
+    "hastscript": "^6.0.0",
     "nyc": "^15.0.0",
     "prettier": "^2.0.0",
     "remark-cli": "^8.0.0",
@@ -54,7 +57,8 @@
     "build": "npm run build-bundle && npm run build-mangle",
     "test-api": "node test",
     "test-coverage": "nyc --reporter lcov tape test.js",
-    "test": "npm run format && npm run build && npm run test-coverage"
+    "test-types": "dtslint types",
+    "test": "npm run format && npm run build && npm run test-coverage && npm run test-types"
   },
   "nyc": {
     "check-coverage": true,
