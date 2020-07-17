@@ -2,13 +2,18 @@ import {Node} from 'unist'
 
 declare namespace sanitize {
   /**
+   * Possible HTML attribute values
+   */
+  type HTMLValue = string | number | boolean
+
+  /**
    * Sanitization configuration
    */
   interface Schema {
     attributes?: {
-      [key: string]: Array<string | [string, ...any[]]>
+      [key: string]: Array<string | [string, ...HTMLValue[]]>
     }
-    required?: {[key: string]: {[key: string]: any}}
+    required?: {[key: string]: {[key: string]: HTMLValue}}
     tagNames?: string[]
     protocols?: {[key: string]: string[]}
     ancestors?: {[key: string]: string[]}
