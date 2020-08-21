@@ -163,7 +163,6 @@ values, such as `class`.
 Say you wanted to allow certain classes on `span` elements for syntax
 highlighting, that can be done like this:
 
-
 ```js
 // …
 "span": [
