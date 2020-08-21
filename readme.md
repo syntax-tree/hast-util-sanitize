@@ -143,7 +143,7 @@ One special value, namely `'data*'`, can be used to allow all `data` properties.
 Instead of a single string (such as `type`), which allows any [*property
 value*][value] of that [*property name*][name], it’s also possible to provide
 an array (such as `['type', 'checkbox']`), where the first entry is the
-*propery name*, and the other entries are allowed *property values*.
+*property name*, and all other entries allowed *property values*.
 
 This is how the default GitHub schema allows only disabled checkbox inputs:
 
@@ -156,6 +156,20 @@ This is how the default GitHub schema allows only disabled checkbox inputs:
   ],
   // …
 }
+```
+
+This also plays well with properties that accept space- or comma-separated
+values, such as `class`.
+Say you wanted to allow certain classes on `span` elements for syntax
+highlighting, that can be done like this:
+
+
+```js
+// …
+"span": [
+  ["className", "token", "number", "operator"]
+],
+// …
 ```
 
 ###### `required`
