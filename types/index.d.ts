@@ -15,14 +15,12 @@ declare namespace sanitize {
      *
      * The special '*' key defines property names allowed on all elements
      */
-    attributes?: {
-      [key: string]: Array<string | [string, ...HTMLValue[]]>
-    }
+    attributes?: Record<string, Array<string | [string, ...HTMLValue[]]>>
 
     /**
      * Map of tag names to required property names and their default property value
      */
-    required?: {[key: string]: {[key: string]: HTMLValue}}
+    required?: Record<string, Record<string, HTMLValue>>
 
     /**
      * List of allowed tag names
@@ -32,12 +30,12 @@ declare namespace sanitize {
     /**
      * Map of protocols to allow in property values
      */
-    protocols?: {[key: string]: string[]}
+    protocols?: Record<string, string[]>
 
     /**
      * Map of tag names to their required ancestor elements
      */
-    ancestors?: {[key: string]: string[]}
+    ancestors?: Record<string, string[]>
 
     /**
      * List of allowed property names which can clobber
