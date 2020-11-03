@@ -78,9 +78,18 @@
     "prettier": true,
     "esnext": false,
     "rules": {
-      "unicorn/prefer-includes": "off",
+      "eqeqeq": [
+        "error",
+        "always",
+        {
+          "null": "ignore"
+        }
+      ],
+      "guard-for-in": "off",
+      "no-eq-null": "off",
       "no-negated-condition": "off",
-      "guard-for-in": "off"
+      "unicorn/explicit-length-check": "off",
+      "unicorn/prefer-includes": "off"
     },
     "ignores": [
       "hast-util-sanitize.js"
