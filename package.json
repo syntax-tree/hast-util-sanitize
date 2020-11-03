@@ -1,6 +1,6 @@
 {
   "name": "hast-util-sanitize",
-  "version": "3.0.0",
+  "version": "3.0.1",
   "description": "hast utility to sanitize nodes",
   "license": "MIT",
   "keywords": [
