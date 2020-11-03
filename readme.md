@@ -324,9 +324,9 @@ abide by its terms.
 
 <!-- Definitions -->
 
-[build-badge]: https://img.shields.io/travis/syntax-tree/hast-util-sanitize.svg
+[build-badge]: https://github.com/syntax-tree/hast-util-sanitize/workflows/main/badge.svg
 
-[build]: https://travis-ci.org/syntax-tree/hast-util-sanitize
+[build]: https://github.com/syntax-tree/hast-util-sanitize/actions
 
 [coverage-badge]: https://img.shields.io/codecov/c/github/syntax-tree/hast-util-sanitize.svg
 
