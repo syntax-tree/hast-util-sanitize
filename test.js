@@ -647,6 +647,15 @@ test('sanitize()', function (t) {
       'should allow known properties'
     )
 
+    t.deepEqual(
+      sanitize(u('root', [h('div', h('li', 'text'))]), {
+        tagNames: ['div', 'ul', 'li'],
+        ancestors: {li: ['ul']}
+      }),
+      u('root', [h('div', 'text')]),
+      'should support `ancestors` to enforce certain ancestors in a `root` (rehypejs/rehype-sanitize#8)'
+    )
+
     t.end()
   })
 
