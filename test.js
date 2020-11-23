@@ -608,6 +608,15 @@ test('sanitize()', function (t) {
       'should support required attributes'
     )
 
+    t.deepEqual(
+      sanitize(h('div', h('li', 'text')), {
+        tagNames: ['div', 'ul', 'li'],
+        ancestors: {li: ['ul']}
+      }),
+      h('div', 'text'),
+      'should support `ancestors` to enforce certain ancestors (rehypejs/rehype-sanitize#8)'
+    )
+
     t.end()
   })
 
