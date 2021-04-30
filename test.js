@@ -9,9 +9,12 @@ import {sanitize, defaultSchema} from './index.js'
 
 test('sanitize()', function (t) {
   t.test('non-node', function (t) {
+    // @ts-ignore runtime.
     t.equal(html(sanitize(true)), '', 'should ignore non-nodes (#1)')
     t.equal(html(sanitize(null)), '', 'should ignore non-nodes (#2)')
+    // @ts-ignore runtime.
     t.equal(html(sanitize(1)), '', 'should ignore non-nodes (#3)')
+    // @ts-ignore runtime.
     t.equal(html(sanitize([])), '', 'should ignore non-nodes (#4)')
 
     t.end()
@@ -19,6 +22,7 @@ test('sanitize()', function (t) {
 
   t.test('unknown nodes', function (t) {
     t.equal(
+      // @ts-ignore runtime.
       html(sanitize(u('unknown', '<xml></xml>'))),
       '',
       'should ignore unknown nodes'
@@ -28,21 +32,25 @@ test('sanitize()', function (t) {
   })
 
   t.test('ignored nodes', function (t) {
+    // @ts-ignore runtime.
     t.equal(html(sanitize(u('raw', '<xml></xml>'))), '', 'should ignore `raw`')
 
     t.equal(
+      // @ts-ignore runtime.
       html(sanitize(u('directive', {name: '!alpha'}, '!alpha bravo'))),
       '',
       'should ignore declaration `directive`s'
     )
 
     t.equal(
+      // @ts-ignore runtime.
       html(sanitize(u('directive', {name: '?xml'}, '?xml version="1.0"'))),
       '',
       'should ignore processing instruction `directive`s'
     )
 
     t.equal(
+      // @ts-ignore runtime.
       html(sanitize(u('characterData', 'alpha'))),
       '',
       'should ignore `characterData`s'
@@ -65,6 +73,7 @@ test('sanitize()', function (t) {
     )
 
     t.equal(
+      // @ts-ignore runtime.
       html(sanitize(u('comment', {toString}), {allowComments: true})),
       '<!---->',
       'should ignore non-string `value`s with `allowComments: true`'
@@ -135,6 +144,7 @@ test('sanitize()', function (t) {
     )
 
     t.equal(
+      // @ts-ignore runtime.
       html(sanitize(u('text', {toString}))),
       '',
       'should ignore non-string `value`s'
@@ -191,6 +201,7 @@ test('sanitize()', function (t) {
     )
 
     t.deepEqual(
+      // @ts-ignore runtime.
       sanitize({
         type: 'element',
         properties: {},
@@ -201,6 +212,7 @@ test('sanitize()', function (t) {
     )
 
     t.deepEqual(
+      // @ts-ignore runtime.
       sanitize({type: 'element', tagName: 'div'}),
       h(''),
       'should support elements without children / properties'
@@ -294,12 +306,14 @@ test('sanitize()', function (t) {
     )
 
     t.deepEqual(
+      // @ts-ignore runtime.
       sanitize(u('element', {tagName: 'img', properties: {alt: null}})),
       h('img'),
       'should ignore `null`'
     )
 
     t.deepEqual(
+      // @ts-ignore runtime.
       sanitize(u('element', {tagName: 'img', properties: {alt: undefined}})),
       h('img'),
       'should ignore `undefined`'
@@ -318,6 +332,7 @@ test('sanitize()', function (t) {
     )
 
     t.deepEqual(
+      // @ts-ignore runtime.
       sanitize(u('element', {tagName: 'img', properties: {alt: {toString}}})),
       h('img'),
       'should ignore objects'
@@ -325,11 +340,13 @@ test('sanitize()', function (t) {
 
     t.deepEqual(
       sanitize(
+        // @ts-ignore runtime.
         u('element', {
           tagName: 'img',
           properties: {alt: [1, true, 'three', [4], {toString}]}
         })
       ),
+      // @ts-ignore runtime.
       h('img', {alt: [1, true, 'three']}),
       'should supports arrays'
     )
@@ -341,7 +358,7 @@ test('sanitize()', function (t) {
     )
 
     t.test('href`', function (t) {
-      testAllURLs(t, 'a', 'href', {
+      testAllUrls(t, 'a', 'href', {
         valid: {
           anchor: '#heading',
           relative: '/file.html',
@@ -367,7 +384,7 @@ test('sanitize()', function (t) {
     })
 
     t.test('`cite`', function (t) {
-      testAllURLs(t, 'blockquote', 'cite', {
+      testAllUrls(t, 'blockquote', 'cite', {
         valid: {
           anchor: '#heading',
           relative: '/file.html',
@@ -392,7 +409,7 @@ test('sanitize()', function (t) {
     })
 
     t.test('`src`', function (t) {
-      testAllURLs(t, 'img', 'src', {
+      testAllUrls(t, 'img', 'src', {
         valid: {
           anchor: '#heading',
           relative: '/file.html',
@@ -417,7 +434,7 @@ test('sanitize()', function (t) {
     })
 
     t.test('`longDesc`', function (t) {
-      testAllURLs(t, 'img', 'longDesc', {
+      testAllUrls(t, 'img', 'longDesc', {
         valid: {
           anchor: '#heading',
           relative: '/file.html',
@@ -664,18 +681,31 @@ function toString() {
   return 'alert(1);'
 }
 
-// Test `valid` and `invalid` `url`s in `prop` on `tagName`.
-function testAllURLs(t, tagName, prop, all) {
-  testURLs(t, tagName, prop, all.valid, true)
-  testURLs(t, tagName, prop, all.invalid, false)
+/**
+ * Test `valid` and `invalid` `url`s in `prop` on `tagName`.
+ *
+ * @param {import('tape').Test} t
+ * @param {string} tagName
+ * @param {string} prop
+ * @param {{valid: Object.<string, string>, invalid: Object.<string, string>}} all
+ */
+function testAllUrls(t, tagName, prop, all) {
+  testUrls(t, tagName, prop, all.valid, true)
+  testUrls(t, tagName, prop, all.invalid, false)
 }
 
-// Test `valid` `url`s in `prop` on `tagName`.
-function testURLs(t, tagName, prop, urls, valid) {
+/**
+ * Test `valid` `url`s in `prop` on `tagName`.
+ *
+ * @param {import('tape').Test} t
+ * @param {string} tagName
+ * @param {string} prop
+ * @param {Object.<string, string>} urls
+ * @param {boolean} valid
+ */
+function testUrls(t, tagName, prop, urls, valid) {
   Object.keys(urls).forEach(function (name) {
-    var props = {}
-
-    props[prop] = urls[name]
+    var props = {[prop]: urls[name]}
 
     t.deepEqual(
       sanitize(h(tagName, props)),
