@@ -26,45 +26,32 @@
     "Titus Wormer <tituswormer@gmail.com> (https://wooorm.com)",
     "Jason Switzer <jswitzer@gmail.com>"
   ],
+  "sideEffects": false,
+  "type": "module",
+  "main": "index.js",
   "types": "types/index.d.ts",
   "files": [
     "types/index.d.ts",
-    "lib",
+    "lib/",
     "index.js"
   ],
-  "dependencies": {
-    "xtend": "^4.0.0"
-  },
   "devDependencies": {
-    "browserify": "^17.0.0",
+    "c8": "^7.0.0",
     "deepmerge": "^4.0.0",
-    "dtslint": "^4.0.0",
     "hast-util-to-html": "^7.0.0",
-    "hastscript": "^6.0.0",
-    "nyc": "^15.0.0",
+    "hastscript": "^7.0.0",
     "prettier": "^2.0.0",
     "remark-cli": "^9.0.0",
     "remark-preset-wooorm": "^8.0.0",
     "tape": "^5.0.0",
-    "tinyify": "^3.0.0",
-    "unist-builder": "^2.0.0",
-    "xo": "^0.38.0"
+    "unist-builder": "^3.0.0",
+    "xo": "^0.39.0"
   },
   "scripts": {
     "format": "remark . -qfo && prettier . -w --loglevel warn && xo --fix",
-    "build-bundle": "browserify . -s hastUtilSanitize -o hast-util-sanitize.js",
-    "build-mangle": "browserify . -s hastUtilSanitize -o hast-util-sanitize.min.js -p tinyify",
-    "build": "npm run build-bundle && npm run build-mangle",
-    "test-api": "node test",
-    "test-coverage": "nyc --reporter lcov tape test.js",
-    "test-types": "dtslint types",
-    "test": "npm run format && npm run build && npm run test-coverage && npm run test-types"
-  },
-  "nyc": {
-    "check-coverage": true,
-    "lines": 100,
-    "functions": 100,
-    "branches": 100
+    "test-api": "node test.js",
+    "test-coverage": "c8 --check-coverage --branches 100 --functions 100 --lines 100 --statements 100 --reporter lcov node test.js",
+    "test": "npm run format && npm run test-coverage"
   },
   "prettier": {
     "tabWidth": 2,
@@ -76,24 +63,13 @@
   },
   "xo": {
     "prettier": true,
-    "esnext": false,
     "rules": {
       "unicorn/no-array-for-each": "off",
-      "eqeqeq": [
-        "error",
-        "always",
-        {
-          "null": "ignore"
-        }
-      ],
-      "guard-for-in": "off",
-      "no-eq-null": "off",
-      "no-negated-condition": "off",
-      "unicorn/explicit-length-check": "off",
-      "unicorn/prefer-includes": "off"
+      "no-var": "off",
+      "prefer-arrow-callback": "off"
     },
-    "ignores": [
-      "hast-util-sanitize.js"
+    "ignore": [
+      "types/"
     ]
   },
   "remarkConfig": {

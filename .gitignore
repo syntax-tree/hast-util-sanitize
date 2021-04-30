@@ -1,8 +1,5 @@
 .DS_Store
 *.log
-.nyc_output/
 coverage/
 node_modules/
-hast-util-sanitize.js
-hast-util-sanitize.min.js
 yarn.lock

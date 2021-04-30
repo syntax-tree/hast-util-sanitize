@@ -1,2 +1,2 @@
-'use strict'
-module.exports = require('./lib')
+export {sanitize} from './lib/index.js'
+export {defaultSchema} from './lib/schema.js'

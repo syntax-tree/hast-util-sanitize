@@ -1,5 +1,2 @@
 coverage/
-hast-util-sanitize.js
-hast-util-sanitize.min.js
-*.json
 *.md

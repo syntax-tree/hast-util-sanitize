@@ -1,13 +1,9 @@
-'use strict'
-
-var test = require('tape')
-var html = require('hast-util-to-html')
-var h = require('hastscript')
-var s = require('hastscript/svg')
-var u = require('unist-builder')
-var merge = require('deepmerge')
-var gh = require('./lib/github')
-var sanitize = require('.')
+import test from 'tape'
+import html from 'hast-util-to-html'
+import {h, s} from 'hastscript'
+import {u} from 'unist-builder'
+import deepmerge from 'deepmerge'
+import {sanitize, defaultSchema} from './index.js'
 
 /* eslint-disable no-script-url, max-params */
 
@@ -69,7 +65,7 @@ test('sanitize()', function (t) {
     )
 
     t.equal(
-      html(sanitize(u('comment', {toString: toString}), {allowComments: true})),
+      html(sanitize(u('comment', {toString}), {allowComments: true})),
       '<!---->',
       'should ignore non-string `value`s with `allowComments: true`'
     )
@@ -139,7 +135,7 @@ test('sanitize()', function (t) {
     )
 
     t.equal(
-      html(sanitize(u('text', {toString: toString}))),
+      html(sanitize(u('text', {toString}))),
       '',
       'should ignore non-string `value`s'
     )
@@ -206,7 +202,7 @@ test('sanitize()', function (t) {
 
     t.deepEqual(
       sanitize({type: 'element', tagName: 'div'}),
-      h(),
+      h(''),
       'should support elements without children / properties'
     )
 
@@ -273,7 +269,7 @@ test('sanitize()', function (t) {
     t.deepEqual(
       sanitize(
         h('div', {dataFoo: 'bar'}),
-        merge(gh, {attributes: {'*': ['data*']}})
+        deepmerge(defaultSchema, {attributes: {'*': ['data*']}})
       ),
       h('div', {dataFoo: 'bar'}),
       'should allow `data*`'
@@ -322,9 +318,7 @@ test('sanitize()', function (t) {
     )
 
     t.deepEqual(
-      sanitize(
-        u('element', {tagName: 'img', properties: {alt: {toString: toString}}})
-      ),
+      sanitize(u('element', {tagName: 'img', properties: {alt: {toString}}})),
       h('img'),
       'should ignore objects'
     )
@@ -333,7 +327,7 @@ test('sanitize()', function (t) {
       sanitize(
         u('element', {
           tagName: 'img',
-          properties: {alt: [1, true, 'three', [4], {toString: toString}]}
+          properties: {alt: [1, true, 'three', [4], {toString}]}
         })
       ),
       h('img', {alt: [1, true, 'three']}),
@@ -547,7 +541,7 @@ test('sanitize()', function (t) {
     )
 
     t.deepEqual(
-      sanitize(h('select'), merge(gh, {tagNames: ['select']})),
+      sanitize(h('select'), deepmerge(defaultSchema, {tagNames: ['select']})),
       h('select'),
       'should support allowing elements through the schema'
     )
@@ -555,7 +549,7 @@ test('sanitize()', function (t) {
     t.deepEqual(
       sanitize(
         h('select', {autoComplete: true}),
-        merge(gh, {tagNames: ['select']})
+        deepmerge(defaultSchema, {tagNames: ['select']})
       ),
       h('select'),
       'should ignore attributes for new elements'
@@ -564,7 +558,7 @@ test('sanitize()', function (t) {
     t.deepEqual(
       sanitize(
         h('select', {autoComplete: true}),
-        merge(gh, {
+        deepmerge(defaultSchema, {
           tagNames: ['select'],
           attributes: {select: ['autoComplete']}
         })
@@ -576,7 +570,7 @@ test('sanitize()', function (t) {
     t.deepEqual(
       sanitize(
         h('div', [h('select', {form: 'one'}), h('select', {form: 'two'})]),
-        merge(gh, {
+        deepmerge(defaultSchema, {
           tagNames: ['select'],
           attributes: {select: [['form', 'one']]}
         })
@@ -593,7 +587,7 @@ test('sanitize()', function (t) {
           h('select', {}),
           h('select', {form: false})
         ]),
-        merge(gh, {
+        deepmerge(defaultSchema, {
           tagNames: ['select'],
           attributes: {select: [['form', 'alpha']]},
           required: {select: {form: 'alpha'}}

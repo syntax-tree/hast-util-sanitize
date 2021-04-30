@@ -12,6 +12,9 @@
 
 ## Install
 
+This package is [ESM only](https://gist.github.com/sindresorhus/a39789f98801d908bbc7ff3ecc99d99c):
+Node 12+ is needed to use it and it must be `import`ed instead of `require`d.
+
 [npm][]:
 
 ```sh
@@ -21,10 +24,10 @@ npm install hast-util-sanitize
 ## Use
 
 ```js
-var h = require('hastscript')
-var u = require('unist-builder')
-var sanitize = require('hast-util-sanitize')
-var toHtml = require('hast-util-to-html')
+import {u} from 'unist-builder'
+import {h} from 'hastscript'
+import {sanitize} from 'hast-util-sanitize'
+import {toHtml} from 'hast-util-to-html'
 
 var tree = h('div', {onmouseover: 'alert("alpha")'}, [
   h(
@@ -71,6 +74,9 @@ Sanitized:
 
 ## API
 
+This package exports the following identifiers: `sanitize`, `defaultSchema`.
+There is no default export.
+
 ### `sanitize(tree[, schema])`
 
 Sanitize a [**hast**][hast] [*tree*][tree].
@@ -90,22 +96,27 @@ Configuration.
 If not given, defaults to [GitHub][] style sanitation.
 If any top-level key isn’t given, it defaults to GitHub’s style too.
 
-For a thorough sample, see [`github.json`][schema-github].
+For a thorough sample, see the code for [`defaultSchema`][default-schema].
 
-To extend the standard schema with a few changes, clone `github.json` like so:
+To extend the standard schema with a few changes, clone `defaultSchema` like so:
 
 ```js
-var h = require('hastscript')
-var merge = require('deepmerge')
-var gh = require('hast-util-sanitize/lib/github')
-var sanitize = require('hast-util-sanitize')
+import {h} from 'hastscript'
+import deepmerge from 'deepmerge'
+import {sanitize, defaultSchema} from 'hast-util-sanitize'
 
-var schema = merge(gh, {attributes: {'*': ['className']}})
+var schema = deepmerge(defaultSchema, {attributes: {'*': ['className']}})
 
 var tree = sanitize(h('div', {className: ['foo']}), schema)
 
 // `tree` still has `className`.
 console.log(tree)
+// {
+//   type: 'element',
+//   tagName: 'div',
+//   properties: {className: ['foo']},
+//   children: []
+// }
 ```
 
 ###### `attributes`
@@ -119,23 +130,18 @@ The special `'*'` key defines [*property names*][name] allowed on all
 One special value, namely `'data*'`, can be used to allow all `data` properties.
 
 ```js
-"attributes": {
-  "a": [
-    "href"
-  ],
-  "img": [
-    "src",
-    "longDesc"
-  ],
+attributes: {
+  a: ['href'],
+  img: ['src', 'longDesc'],
   // …
-  "*": [
-    "abbr",
-    "accept",
-    "acceptCharset",
+  '*': [
+    'abbr',
+    'accept',
+    'acceptCharset',
     // …
-    "vSpace",
-    "width",
-    "itemProp"
+    'vSpace',
+    'width',
+    'itemProp'
   ]
 }
 ```
@@ -148,12 +154,12 @@ an array (such as `['type', 'checkbox']`), where the first entry is the
 This is how the default GitHub schema allows only disabled checkbox inputs:
 
 ```js
-"attributes": {
+attributes: {
   // …
-  "input": [
-    ["type", "checkbox"],
-    ["disabled", true]
-  ],
+  input: [
+    ['type', 'checkbox'],
+    ['disabled', true]
+  ]
   // …
 }
 ```
@@ -165,9 +171,9 @@ highlighting, that can be done like this:
 
 ```js
 // …
-"span": [
-  ["className", "token", "number", "operator"]
-],
+span: [
+  ['className', 'token', 'number', 'operator']
+]
 // …
 ```
 
@@ -183,11 +189,8 @@ so *properties* could be removed by that step and then added again through
 `required`.
 
 ```js
-"required": {
-  "input": {
-    "type": "checkbox",
-    "disabled": true
-  }
+required: {
+  input: {type: 'checkbox', disabled: true}
 }
 ```
 
@@ -196,14 +199,14 @@ so *properties* could be removed by that step and then added again through
 List of allowed tag names (`Array.<string>`).
 
 ```js
-"tagNames": [
-  "h1",
-  "h2",
-  "h3",
+tagNames: [
+  'h1',
+  'h2',
+  'h3',
   // …
-  "strike",
-  "summary",
-  "details"
+  'strike',
+  'summary',
+  'details'
 ]
 ```
 
@@ -213,17 +216,10 @@ Map of protocols to allow in [*property values*][value]
 (`Object.<Array.<string>>`).
 
 ```js
-"protocols": {
-  "href": [
-    "http",
-    "https",
-    "mailto"
-  ],
+protocols: {
+  href: ['http', 'https', 'mailto'],
   // …
-  "longDesc": [
-    "http",
-    "https"
-  ]
+  longDesc: ['http', 'https']
 }
 ```
 
@@ -233,15 +229,10 @@ Map of tag names to their required [*ancestor*][ancestor] [*elements*][element]
 (`Object.<Array.<string>>`).
 
 ```js
-"ancestors": {
-  "li": [
-    "ol",
-    "ul"
-  ],
+ancestors: {
+  li: ['ol', 'ul'],
   // …
-  "tr": [
-    "table"
-  ]
+  tr: ['table']
 }
 ```
 
@@ -250,10 +241,7 @@ Map of tag names to their required [*ancestor*][ancestor] [*elements*][element]
 List of allowed [*property names*][name] which can clobber (`Array.<string>`).
 
 ```js
-"clobber": [
-  "name",
-  "id"
-]
+clobber: ['name', 'id']
 ```
 
 ###### `clobberPrefix`
@@ -261,7 +249,7 @@ List of allowed [*property names*][name] which can clobber (`Array.<string>`).
 Prefix to use before potentially clobbering [*property names*][name] (`string`).
 
 ```js
-"clobberPrefix": "user-content-"
+clobberPrefix: 'user-content-'
 ```
 
 ###### `strip`
@@ -273,9 +261,7 @@ By default, unsafe *elements* are replaced by their [*children*][child].
 Some *elements*, should however be entirely stripped from the *tree*.
 
 ```js
-"strip": [
-  "script"
-]
+strip: ['script']
 ```
 
 ###### `allowComments`
@@ -283,7 +269,7 @@ Some *elements*, should however be entirely stripped from the *tree*.
 Whether to allow [*comments*][comment] (`boolean`, default: `false`).
 
 ```js
-"allowComments": true
+allowComments: true
 ```
 
 ###### `allowDoctypes`
@@ -291,7 +277,7 @@ Whether to allow [*comments*][comment] (`boolean`, default: `false`).
 Whether to allow [*doctypes*][doctype] (`boolean`, default: `false`).
 
 ```js
-"allowDoctypes": true
+allowDoctypes: true
 ```
 
 ## Security
@@ -388,6 +374,6 @@ abide by its terms.
 
 [xss]: https://en.wikipedia.org/wiki/Cross-site_scripting
 
-[schema-github]: lib/github.json
+[default-schema]: lib/schema.js
 
 [schema]: #schema
