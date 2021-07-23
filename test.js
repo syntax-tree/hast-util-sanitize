@@ -1,5 +1,5 @@
 import test from 'tape'
-import html from 'hast-util-to-html'
+import {toHtml} from 'hast-util-to-html'
 import {h, s} from 'hastscript'
 import {u} from 'unist-builder'
 import deepmerge from 'deepmerge'
@@ -12,13 +12,13 @@ const own = {}.hasOwnProperty
 test('sanitize()', (t) => {
   t.test('non-node', (t) => {
     // @ts-expect-error runtime.
-    t.equal(html(sanitize(true)), '', 'should ignore non-nodes (#1)')
+    t.equal(toHtml(sanitize(true)), '', 'should ignore non-nodes (#1)')
     // @ts-expect-error runtime.
-    t.equal(html(sanitize(null)), '', 'should ignore non-nodes (#2)')
+    t.equal(toHtml(sanitize(null)), '', 'should ignore non-nodes (#2)')
     // @ts-expect-error runtime.
-    t.equal(html(sanitize(1)), '', 'should ignore non-nodes (#3)')
+    t.equal(toHtml(sanitize(1)), '', 'should ignore non-nodes (#3)')
     // @ts-expect-error runtime.
-    t.equal(html(sanitize([])), '', 'should ignore non-nodes (#4)')
+    t.equal(toHtml(sanitize([])), '', 'should ignore non-nodes (#4)')
 
     t.end()
   })
@@ -26,7 +26,7 @@ test('sanitize()', (t) => {
   t.test('unknown nodes', (t) => {
     t.equal(
       // @ts-expect-error runtime.
-      html(sanitize(u('unknown', '<xml></xml>'))),
+      toHtml(sanitize(u('unknown', '<xml></xml>'))),
       '',
       'should ignore unknown nodes'
     )
@@ -35,26 +35,30 @@ test('sanitize()', (t) => {
   })
 
   t.test('ignored nodes', (t) => {
-    // @ts-expect-error runtime.
-    t.equal(html(sanitize(u('raw', '<xml></xml>'))), '', 'should ignore `raw`')
+    t.equal(
+      // @ts-expect-error runtime.
+      toHtml(sanitize(u('raw', '<xml></xml>'))),
+      '',
+      'should ignore `raw`'
+    )
 
     t.equal(
       // @ts-expect-error runtime.
-      html(sanitize(u('directive', {name: '!alpha'}, '!alpha bravo'))),
+      toHtml(sanitize(u('directive', {name: '!alpha'}, '!alpha bravo'))),
       '',
       'should ignore declaration `directive`s'
     )
 
     t.equal(
       // @ts-expect-error runtime.
-      html(sanitize(u('directive', {name: '?xml'}, '?xml version="1.0"'))),
+      toHtml(sanitize(u('directive', {name: '?xml'}, '?xml version="1.0"'))),
       '',
       'should ignore processing instruction `directive`s'
     )
 
     t.equal(
       // @ts-expect-error runtime.
-      html(sanitize(u('characterData', 'alpha'))),
+      toHtml(sanitize(u('characterData', 'alpha'))),
       '',
       'should ignore `characterData`s'
     )
@@ -64,26 +68,26 @@ test('sanitize()', (t) => {
 
   t.test('`comment`', (t) => {
     t.equal(
-      html(sanitize(u('comment', 'alpha'))),
+      toHtml(sanitize(u('comment', 'alpha'))),
       '',
       'should ignore `comment`s by default'
     )
 
     t.equal(
-      html(sanitize(u('comment', 'alpha'), {allowComments: true})),
+      toHtml(sanitize(u('comment', 'alpha'), {allowComments: true})),
       '<!--alpha-->',
       'should allow `comment`s with `allowComments: true`'
     )
 
     t.equal(
       // @ts-expect-error runtime.
-      html(sanitize(u('comment', {toString}), {allowComments: true})),
+      toHtml(sanitize(u('comment', {toString}), {allowComments: true})),
       '<!---->',
       'should ignore non-string `value`s with `allowComments: true`'
     )
 
     t.equal(
-      html(
+      toHtml(
         sanitize(u('comment', 'alpha--><script>alert(1)</script><!--bravo'), {
           allowComments: true
         })
@@ -97,13 +101,13 @@ test('sanitize()', (t) => {
 
   t.test('`doctype`', (t) => {
     t.equal(
-      html(sanitize(u('doctype', {name: 'html'}, 'alpha'))),
+      toHtml(sanitize(u('doctype', {name: 'html'}, 'alpha'))),
       '',
       'should ignore `doctype`s by default'
     )
 
     t.equal(
-      html(
+      toHtml(
         sanitize(u('doctype', {name: 'html'}, 'alpha'), {allowDoctypes: true})
       ),
       '<!doctype html>',
@@ -142,26 +146,26 @@ test('sanitize()', (t) => {
     )
 
     t.equal(
-      html(sanitize(u('text', 'alert(1)'))),
+      toHtml(sanitize(u('text', 'alert(1)'))),
       'alert(1)',
       'should allow `text`'
     )
 
     t.equal(
       // @ts-expect-error runtime.
-      html(sanitize(u('text', {toString}))),
+      toHtml(sanitize(u('text', {toString}))),
       '',
       'should ignore non-string `value`s'
     )
 
     t.equal(
-      html(sanitize(h('script', u('text', 'alert(1)')))),
+      toHtml(sanitize(h('script', u('text', 'alert(1)')))),
       '',
       'should ignore `text` in `script` elements'
     )
 
     t.equal(
-      html(sanitize(h('style', u('text', 'alert(1)')))),
+      toHtml(sanitize(h('style', u('text', 'alert(1)')))),
       'alert(1)',
       'should show `text` in `style` elements'
     )

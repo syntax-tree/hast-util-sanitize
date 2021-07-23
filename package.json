@@ -42,7 +42,7 @@
     "@types/tape": "^4.0.0",
     "c8": "^7.0.0",
     "deepmerge": "^4.0.0",
-    "hast-util-to-html": "^7.0.0",
+    "hast-util-to-html": "^8.0.0",
     "hastscript": "^7.0.0",
     "prettier": "^2.0.0",
     "remark-cli": "^9.0.0",
