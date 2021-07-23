@@ -11,12 +11,13 @@ const own = {}.hasOwnProperty
 
 test('sanitize()', (t) => {
   t.test('non-node', (t) => {
-    // @ts-ignore runtime.
+    // @ts-expect-error runtime.
     t.equal(html(sanitize(true)), '', 'should ignore non-nodes (#1)')
+    // @ts-expect-error runtime.
     t.equal(html(sanitize(null)), '', 'should ignore non-nodes (#2)')
-    // @ts-ignore runtime.
+    // @ts-expect-error runtime.
     t.equal(html(sanitize(1)), '', 'should ignore non-nodes (#3)')
-    // @ts-ignore runtime.
+    // @ts-expect-error runtime.
     t.equal(html(sanitize([])), '', 'should ignore non-nodes (#4)')
 
     t.end()
@@ -24,7 +25,7 @@ test('sanitize()', (t) => {
 
   t.test('unknown nodes', (t) => {
     t.equal(
-      // @ts-ignore runtime.
+      // @ts-expect-error runtime.
       html(sanitize(u('unknown', '<xml></xml>'))),
       '',
       'should ignore unknown nodes'
@@ -34,25 +35,25 @@ test('sanitize()', (t) => {
   })
 
   t.test('ignored nodes', (t) => {
-    // @ts-ignore runtime.
+    // @ts-expect-error runtime.
     t.equal(html(sanitize(u('raw', '<xml></xml>'))), '', 'should ignore `raw`')
 
     t.equal(
-      // @ts-ignore runtime.
+      // @ts-expect-error runtime.
       html(sanitize(u('directive', {name: '!alpha'}, '!alpha bravo'))),
       '',
       'should ignore declaration `directive`s'
     )
 
     t.equal(
-      // @ts-ignore runtime.
+      // @ts-expect-error runtime.
       html(sanitize(u('directive', {name: '?xml'}, '?xml version="1.0"'))),
       '',
       'should ignore processing instruction `directive`s'
     )
 
     t.equal(
-      // @ts-ignore runtime.
+      // @ts-expect-error runtime.
       html(sanitize(u('characterData', 'alpha'))),
       '',
       'should ignore `characterData`s'
@@ -75,7 +76,7 @@ test('sanitize()', (t) => {
     )
 
     t.equal(
-      // @ts-ignore runtime.
+      // @ts-expect-error runtime.
       html(sanitize(u('comment', {toString}), {allowComments: true})),
       '<!---->',
       'should ignore non-string `value`s with `allowComments: true`'
@@ -147,7 +148,7 @@ test('sanitize()', (t) => {
     )
 
     t.equal(
-      // @ts-ignore runtime.
+      // @ts-expect-error runtime.
       html(sanitize(u('text', {toString}))),
       '',
       'should ignore non-string `value`s'
@@ -205,7 +206,7 @@ test('sanitize()', (t) => {
     )
 
     t.deepEqual(
-      // @ts-ignore runtime.
+      // @ts-expect-error runtime.
       sanitize({
         type: 'element',
         properties: {},
@@ -216,7 +217,7 @@ test('sanitize()', (t) => {
     )
 
     t.deepEqual(
-      // @ts-ignore runtime.
+      // @ts-expect-error runtime.
       sanitize({type: 'element', tagName: 'div'}),
       h(''),
       'should support elements without children / properties'
@@ -310,14 +311,14 @@ test('sanitize()', (t) => {
     )
 
     t.deepEqual(
-      // @ts-ignore runtime.
+      // @ts-expect-error runtime.
       sanitize(u('element', {tagName: 'img', properties: {alt: null}})),
       h('img'),
       'should ignore `null`'
     )
 
     t.deepEqual(
-      // @ts-ignore runtime.
+      // @ts-expect-error runtime.
       sanitize(u('element', {tagName: 'img', properties: {alt: undefined}})),
       h('img'),
       'should ignore `undefined`'
@@ -336,7 +337,7 @@ test('sanitize()', (t) => {
     )
 
     t.deepEqual(
-      // @ts-ignore runtime.
+      // @ts-expect-error runtime.
       sanitize(u('element', {tagName: 'img', properties: {alt: {toString}}})),
       h('img'),
       'should ignore objects'
@@ -344,13 +345,13 @@ test('sanitize()', (t) => {
 
     t.deepEqual(
       sanitize(
-        // @ts-ignore runtime.
+        // @ts-expect-error runtime.
         u('element', {
           tagName: 'img',
           properties: {alt: [1, true, 'three', [4], {toString}]}
         })
       ),
-      // @ts-ignore runtime.
+      // @ts-expect-error runtime.
       h('img', {alt: [1, true, 'three']}),
       'should supports arrays'
     )
