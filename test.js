@@ -114,6 +114,7 @@ test('sanitize()', function (t) {
     t.deepEqual(
       sanitize({
         type: 'text',
+        // @ts-expect-error: runtime.
         tagName: 'div',
         value: 'alert(1)',
         unknown: 'alert(1)',
@@ -170,6 +171,7 @@ test('sanitize()', function (t) {
       sanitize({
         type: 'element',
         tagName: 'div',
+        // @ts-expect-error: runtime.
         value: 'alert(1)',
         unknown: 'alert(1)',
         properties: {href: 'javascript:alert(1)'},
@@ -635,6 +637,7 @@ test('sanitize()', function (t) {
     t.deepEqual(
       sanitize({
         type: 'root',
+        // @ts-expect-error: runtime.
         tagName: 'div',
         value: 'alert(1)',
         unknown: 'alert(1)',
