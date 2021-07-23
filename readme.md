@@ -29,7 +29,7 @@ import {h} from 'hastscript'
 import {sanitize} from 'hast-util-sanitize'
 import {toHtml} from 'hast-util-to-html'
 
-var tree = h('div', {onmouseover: 'alert("alpha")'}, [
+const tree = h('div', {onmouseover: 'alert("alpha")'}, [
   h(
     'a',
     {href: 'jAva script:alert("bravo")', onclick: 'alert("charlie")'},
@@ -45,8 +45,8 @@ var tree = h('div', {onmouseover: 'alert("alpha")'}, [
   h('math', h('mi', {'xlink:href': 'data:x,<script>alert("foxtrot")</script>'}))
 ])
 
-var unsanitized = toHtml(tree)
-var sanitized = toHtml(sanitize(tree))
+const unsanitized = toHtml(tree)
+const sanitized = toHtml(sanitize(tree))
 
 console.log(unsanitized)
 console.log(sanitized)

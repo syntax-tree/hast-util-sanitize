@@ -5,10 +5,12 @@ import {u} from 'unist-builder'
 import deepmerge from 'deepmerge'
 import {sanitize, defaultSchema} from './index.js'
 
+const own = {}.hasOwnProperty
+
 /* eslint-disable no-script-url, max-params */
 
-test('sanitize()', function (t) {
-  t.test('non-node', function (t) {
+test('sanitize()', (t) => {
+  t.test('non-node', (t) => {
     // @ts-ignore runtime.
     t.equal(html(sanitize(true)), '', 'should ignore non-nodes (#1)')
     t.equal(html(sanitize(null)), '', 'should ignore non-nodes (#2)')
@@ -20,7 +22,7 @@ test('sanitize()', function (t) {
     t.end()
   })
 
-  t.test('unknown nodes', function (t) {
+  t.test('unknown nodes', (t) => {
     t.equal(
       // @ts-ignore runtime.
       html(sanitize(u('unknown', '<xml></xml>'))),
@@ -31,7 +33,7 @@ test('sanitize()', function (t) {
     t.end()
   })
 
-  t.test('ignored nodes', function (t) {
+  t.test('ignored nodes', (t) => {
     // @ts-ignore runtime.
     t.equal(html(sanitize(u('raw', '<xml></xml>'))), '', 'should ignore `raw`')
 
@@ -59,7 +61,7 @@ test('sanitize()', function (t) {
     t.end()
   })
 
-  t.test('`comment`', function (t) {
+  t.test('`comment`', (t) => {
     t.equal(
       html(sanitize(u('comment', 'alpha'))),
       '',
@@ -92,7 +94,7 @@ test('sanitize()', function (t) {
     t.end()
   })
 
-  t.test('`doctype`', function (t) {
+  t.test('`doctype`', (t) => {
     t.equal(
       html(sanitize(u('doctype', {name: 'html'}, 'alpha'))),
       '',
@@ -110,7 +112,7 @@ test('sanitize()', function (t) {
     t.end()
   })
 
-  t.test('`text`', function (t) {
+  t.test('`text`', (t) => {
     t.deepEqual(
       sanitize({
         type: 'text',
@@ -166,7 +168,7 @@ test('sanitize()', function (t) {
     t.end()
   })
 
-  t.test('`element`', function (t) {
+  t.test('`element`', (t) => {
     t.deepEqual(
       sanitize({
         type: 'element',
@@ -359,7 +361,7 @@ test('sanitize()', function (t) {
       'should ignore `svg` elements'
     )
 
-    t.test('href`', function (t) {
+    t.test('href`', (t) => {
       testAllUrls(t, 'a', 'href', {
         valid: {
           anchor: '#heading',
@@ -385,7 +387,7 @@ test('sanitize()', function (t) {
       t.end()
     })
 
-    t.test('`cite`', function (t) {
+    t.test('`cite`', (t) => {
       testAllUrls(t, 'blockquote', 'cite', {
         valid: {
           anchor: '#heading',
@@ -410,7 +412,7 @@ test('sanitize()', function (t) {
       t.end()
     })
 
-    t.test('`src`', function (t) {
+    t.test('`src`', (t) => {
       testAllUrls(t, 'img', 'src', {
         valid: {
           anchor: '#heading',
@@ -435,7 +437,7 @@ test('sanitize()', function (t) {
       t.end()
     })
 
-    t.test('`longDesc`', function (t) {
+    t.test('`longDesc`', (t) => {
       testAllUrls(t, 'img', 'longDesc', {
         valid: {
           anchor: '#heading',
@@ -460,7 +462,7 @@ test('sanitize()', function (t) {
       t.end()
     })
 
-    t.test('`li`', function (t) {
+    t.test('`li`', (t) => {
       t.deepEqual(
         sanitize(h('li', 'alert(1)')),
         h('li', 'alert(1)'),
@@ -493,8 +495,13 @@ test('sanitize()', function (t) {
 
       t.end()
     })
-    ;['tr', 'td', 'th', 'tbody', 'thead', 'tfoot'].forEach(function (name) {
-      t.test('`' + name + '`', function (t) {
+
+    const tableNames = ['tr', 'td', 'th', 'tbody', 'thead', 'tfoot']
+    let index = -1
+
+    while (++index < tableNames.length) {
+      const name = tableNames[index]
+      t.test('`' + name + '`', (t) => {
         t.deepEqual(
           sanitize(h(name, 'alert(1)')),
           u('text', 'alert(1)'),
@@ -515,7 +522,7 @@ test('sanitize()', function (t) {
 
         t.end()
       })
-    })
+    }
 
     t.deepEqual(
       sanitize(h('input')),
@@ -633,7 +640,7 @@ test('sanitize()', function (t) {
     t.end()
   })
 
-  t.test('`root`', function (t) {
+  t.test('`root`', (t) => {
     t.deepEqual(
       sanitize({
         type: 'root',
@@ -707,15 +714,20 @@ function testAllUrls(t, tagName, prop, all) {
  * @param {boolean} valid
  */
 function testUrls(t, tagName, prop, urls, valid) {
-  Object.keys(urls).forEach(function (name) {
-    var props = {[prop]: urls[name]}
+  /** @type {string} */
+  let name
 
-    t.deepEqual(
-      sanitize(h(tagName, props)),
-      h(tagName, valid ? props : {}),
-      'should ' + (valid ? 'allow' : 'clean') + ' ' + name
-    )
-  })
+  for (name in urls) {
+    if (own.call(urls, name)) {
+      const props = {[prop]: urls[name]}
+
+      t.deepEqual(
+        sanitize(h(tagName, props)),
+        h(tagName, valid ? props : {}),
+        'should ' + (valid ? 'allow' : 'clean') + ' ' + name
+      )
+    }
+  }
 }
 
 /* eslint-enable no-script-url, max-params */
