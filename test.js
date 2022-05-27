@@ -702,7 +702,7 @@ function toString() {
  * @param {import('tape').Test} t
  * @param {string} tagName
  * @param {string} prop
- * @param {{valid: Object.<string, string>, invalid: Object.<string, string>}} all
+ * @param {{valid: Record<string, string>, invalid: Record<string, string>}} all
  */
 function testAllUrls(t, tagName, prop, all) {
   testUrls(t, tagName, prop, all.valid, true)
@@ -715,7 +715,7 @@ function testAllUrls(t, tagName, prop, all) {
  * @param {import('tape').Test} t
  * @param {string} tagName
  * @param {string} prop
- * @param {Object.<string, string>} urls
+ * @param {Record<string, string>} urls
  * @param {boolean} valid
  */
 function testUrls(t, tagName, prop, urls, valid) {

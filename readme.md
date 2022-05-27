@@ -122,7 +122,7 @@ console.log(tree)
 ###### `attributes`
 
 Map of tag names to allowed [*property names*][name]
-(`Object.<Array.<string>>`).
+(`Record<string, Array<string>>`).
 
 The special `'*'` key defines [*property names*][name] allowed on all
 [*elements*][element].
@@ -180,7 +180,7 @@ span: [
 ###### `required`
 
 Map of tag names to required [*property names*][name] and their default
-[*property value*][value] (`Object.<Object.<*>>`).
+[*property value*][value] (`Record<string, Record<string, *>>`).
 If the defined keys do not exist in an [*element*][element]’s
 [*properties*][properties], they are added and set to the specified value.
 
@@ -196,7 +196,7 @@ required: {
 
 ###### `tagNames`
 
-List of allowed tag names (`Array.<string>`).
+List of allowed tag names (`Array<string>`).
 
 ```js
 tagNames: [
@@ -213,7 +213,7 @@ tagNames: [
 ###### `protocols`
 
 Map of protocols to allow in [*property values*][value]
-(`Object.<Array.<string>>`).
+(`Record<string, Array<string>>`).
 
 ```js
 protocols: {
@@ -226,7 +226,7 @@ protocols: {
 ###### `ancestors`
 
 Map of tag names to their required [*ancestor*][ancestor] [*elements*][element]
-(`Object.<Array.<string>>`).
+(`Record<string, Array<string>>`).
 
 ```js
 ancestors: {
@@ -238,7 +238,7 @@ ancestors: {
 
 ###### `clobber`
 
-List of allowed [*property names*][name] which can clobber (`Array.<string>`).
+List of allowed [*property names*][name] which can clobber (`Array<string>`).
 
 ```js
 clobber: ['name', 'id']
@@ -255,7 +255,7 @@ clobberPrefix: 'user-content-'
 ###### `strip`
 
 Names of [*elements*][element] to strip from the [*tree*][tree]
-(`Array.<string>`).
+(`Array<string>`).
 
 By default, unsafe *elements* are replaced by their [*children*][child].
 Some *elements*, should however be entirely stripped from the *tree*.
