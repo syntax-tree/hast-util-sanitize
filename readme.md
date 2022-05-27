@@ -8,17 +8,59 @@
 [![Backers][backers-badge]][collective]
 [![Chat][chat-badge]][chat]
 
-[**hast**][hast] utility to sanitize a [*tree*][tree].
+[hast][] utility to make trees safe.
+
+## Contents
+
+*   [What is this?](#what-is-this)
+*   [When should I use this?](#when-should-i-use-this)
+*   [Install](#install)
+*   [Use](#use)
+*   [API](#api)
+    *   [`sanitize(tree[, schema])`](#sanitizetree-schema)
+    *   [`Schema`](#schema)
+*   [Types](#types)
+*   [Compatibility](#compatibility)
+*   [Security](#security)
+*   [Related](#related)
+*   [Contribute](#contribute)
+*   [License](#license)
+
+## What is this?
+
+This package is a utility that can make a tree that potentially contains
+dangerous user content safe for use.
+It defaults to what GitHub does to clean unsafe markup, but you can change that.
+
+## When should I use this?
+
+This package is needed whenever you deal with potentially dangerous user
+content.
+
+The plugin [`rehype-sanitize`][rehype-sanitize] wraps this utility to also
+sanitize HTML at a higher-level (easier) abstraction.
 
 ## Install
 
-This package is [ESM only](https://gist.github.com/sindresorhus/a39789f98801d908bbc7ff3ecc99d99c):
-Node 12+ is needed to use it and it must be `import`ed instead of `require`d.
-
-[npm][]:
+This package is [ESM only][esm].
+In Node.js (version 12.20+, 14.14+, 16.0+, or 18.0+), install with [npm][]:
 
 ```sh
 npm install hast-util-sanitize
+```
+
+In Deno with [`esm.sh`][esmsh]:
+
+```js
+import {sanitize} from 'https://esm.sh/hast-util-sanitize@4'
+```
+
+In browsers with [`esm.sh`][esmsh]:
+
+```html
+<script type="module">
+  import {sanitize} from 'https://esm.sh/hast-util-sanitize@4?bundle'
+</script>
 ```
 
 ## Use
@@ -74,26 +116,28 @@ Sanitized:
 
 ## API
 
-This package exports the following identifiers: `sanitize`, `defaultSchema`.
+This package exports the identifiers `sanitize` and `defaultSchema`.
 There is no default export.
 
 ### `sanitize(tree[, schema])`
 
-Sanitize a [**hast**][hast] [*tree*][tree].
+Sanitize a tree.
 
 ###### Parameters
 
-*   `tree` ([`Node`][node]) — [*Tree*][tree] to sanitize
-*   `schema` ([`Schema`][schema], optional) — Schema defining how to sanitize
+*   `tree` ([`Node`][node]) — [*tree*][tree] to sanitize
+*   `schema` ([`Schema`][schema], optional) — schema defining how to sanitize
 
 ###### Returns
 
-[`Node`][node] — A new, sanitized [*tree*][tree].
+A new, sanitized, tree ([`Node`][node]).
 
 ### `Schema`
 
-Configuration.
-If not given, defaults to [GitHub][] style sanitation.
+Sanitation schema that defines if and how nodes and properties should be
+cleaned.
+The default schema is exported as `defaultSchema`, which defaults to [GitHub][]
+style sanitation.
 If any top-level key isn’t given, it defaults to GitHub’s style too.
 
 For a thorough sample, see the code for [`defaultSchema`][default-schema].
@@ -102,12 +146,12 @@ To extend the standard schema with a few changes, clone `defaultSchema` like so:
 
 ```js
 import {h} from 'hastscript'
-import deepmerge from 'deepmerge'
+import deepmerge from 'deepmerge' // You can use `structuredClone` in modern JS.
 import {sanitize, defaultSchema} from 'hast-util-sanitize'
 
-var schema = deepmerge(defaultSchema, {attributes: {'*': ['className']}})
+const schema = deepmerge(defaultSchema, {attributes: {'*': ['className']}})
 
-var tree = sanitize(h('div', {className: ['foo']}), schema)
+const tree = sanitize(h('div', {className: ['foo']}), schema)
 
 // `tree` still has `className`.
 console.log(tree)
@@ -127,7 +171,7 @@ Map of tag names to allowed [*property names*][name]
 The special `'*'` key defines [*property names*][name] allowed on all
 [*elements*][element].
 
-One special value, namely `'data*'`, can be used to allow all `data` properties.
+One special value, `'data*'`, can be used to allow all `data` properties.
 
 ```js
 attributes: {
@@ -150,7 +194,6 @@ Instead of a single string (such as `type`), which allows any [*property
 value*][value] of that [*property name*][name], it’s also possible to provide
 an array (such as `['type', 'checkbox']`), where the first entry is the
 *property name*, and all other entries allowed *property values*.
-
 This is how the default GitHub schema allows only disabled checkbox inputs:
 
 ```js
@@ -280,24 +323,36 @@ Whether to allow [*doctypes*][doctype] (`boolean`, default: `false`).
 allowDoctypes: true
 ```
 
+## Types
+
+This package is fully typed with [TypeScript][].
+It exports the additional type `Schema`.
+
+## Compatibility
+
+Projects maintained by the unified collective are compatible with all maintained
+versions of Node.js.
+As of now, that is Node.js 12.20+, 14.14+, 16.0+, and 18.0+.
+Our projects sometimes work with older versions, but this is not guaranteed.
+
 ## Security
 
-Improper use of `hast-util-sanitize` can open you up to a
+By default, `hast-util-sanitize` will make everything safe to use.
+But when used incorrectly, deviating from the defaults can open you up to a
 [cross-site scripting (XSS)][xss] attack.
-The defaults *are* safe, but deviating from them is likely *unsafe*.
 
-Use `hast-util-sanitize` *after* all other utilities, as other utilities are
-likely also unsafe.
+Use `hast-util-sanitize` after the last unsafe thing: everything after it could
+be unsafe (but is fine if you do trust it).
 
 ## Related
 
 *   [`rehype-sanitize`](https://github.com/rehypejs/rehype-sanitize)
-    — [rehype](https://github.com/rehypejs/rehype) plugin wrapper
+    — rehype plugin
 
 ## Contribute
 
-See [`contributing.md` in `syntax-tree/.github`][contributing] for ways to get
-started.
+See [`contributing.md`][contributing] in [`rehypejs/.github`][health] for ways
+to get started.
 See [`support.md`][support] for ways to get help.
 
 This project has a [code of conduct][coc].
@@ -338,15 +393,23 @@ abide by its terms.
 
 [npm]: https://docs.npmjs.com/cli/install
 
+[esm]: https://gist.github.com/sindresorhus/a39789f98801d908bbc7ff3ecc99d99c
+
+[esmsh]: https://esm.sh
+
+[typescript]: https://www.typescriptlang.org
+
 [license]: license
 
 [author]: https://wooorm.com
 
-[contributing]: https://github.com/syntax-tree/.github/blob/HEAD/contributing.md
+[health]: https://github.com/syntax-tree/.github
 
-[support]: https://github.com/syntax-tree/.github/blob/HEAD/support.md
+[contributing]: https://github.com/syntax-tree/.github/blob/main/contributing.md
 
-[coc]: https://github.com/syntax-tree/.github/blob/HEAD/code-of-conduct.md
+[support]: https://github.com/syntax-tree/.github/blob/main/support.md
+
+[coc]: https://github.com/syntax-tree/.github/blob/main/code-of-conduct.md
 
 [tree]: https://github.com/syntax-tree/unist#tree
 
@@ -377,3 +440,5 @@ abide by its terms.
 [default-schema]: lib/schema.js
 
 [schema]: #schema
+
+[rehype-sanitize]: https://github.com/rehypejs/rehype-sanitize
