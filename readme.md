@@ -351,8 +351,8 @@ be unsafe (but is fine if you do trust it).
 
 ## Contribute
 
-See [`contributing.md`][contributing] in [`rehypejs/.github`][health] for ways
-to get started.
+See [`contributing.md`][contributing] in [`syntax-tree/.github`][health] for
+ways to get started.
 See [`support.md`][support] for ways to get help.
 
 This project has a [code of conduct][coc].
