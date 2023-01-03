@@ -192,8 +192,9 @@ attributes: {
 
 Instead of a single string (such as `type`), which allows any [*property
 value*][value] of that [*property name*][name], it’s also possible to provide
-an array (such as `['type', 'checkbox']`), where the first entry is the
-*property name*, and all other entries allowed *property values*.
+an array (such as `['type', 'checkbox']` or `['className', /^hljs-/]`),
+where the first entry is the *property name*, and all other entries are
+*property values* allowed (or regular expressions that are tested with values).
 This is how the default GitHub schema allows only disabled checkbox inputs:
 
 ```js

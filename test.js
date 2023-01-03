@@ -613,6 +613,30 @@ test('sanitize()', (t) => {
     t.deepEqual(
       sanitize(
         h('div', [
+          h('span', {className: 'a-one'}),
+          h('span', {className: 'a-two'}),
+          h('span', {className: 'b-one'}),
+          h('span', {className: 'b-two'}),
+          h('span', {className: 'a-one a-two b-one b-two'})
+        ]),
+        deepmerge(defaultSchema, {
+          tagNames: ['span'],
+          attributes: {span: [['className', /^a-/, 'b-one']]}
+        })
+      ),
+      h('div', [
+        h('span', {className: 'a-one'}),
+        h('span', {className: 'a-two'}),
+        h('span', {className: 'b-one'}),
+        h('span', {className: []}),
+        h('span', {className: 'a-one a-two b-one'})
+      ]),
+      'should support RegExp in the list of valid values'
+    )
+
+    t.deepEqual(
+      sanitize(
+        h('div', [
           h('select', {form: 'alpha'}),
           h('select', {form: 'bravo'}),
           h('select', {}),
