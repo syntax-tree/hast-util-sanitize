@@ -1,4 +1,5 @@
-import test from 'tape'
+import assert from 'node:assert/strict'
+import test from 'node:test'
 import {toHtml} from 'hast-util-to-html'
 import {h, s} from 'hastscript'
 import {u} from 'unist-builder'
@@ -7,86 +8,78 @@ import {sanitize, defaultSchema} from './index.js'
 
 const own = {}.hasOwnProperty
 
-/* eslint-disable no-script-url, max-params */
-
-test('sanitize()', (t) => {
-  t.test('non-node', (t) => {
+test('sanitize()', async (t) => {
+  await t.test('non-node', () => {
     // @ts-expect-error runtime.
-    t.equal(toHtml(sanitize(true)), '', 'should ignore non-nodes (#1)')
+    assert.equal(toHtml(sanitize(true)), '', 'should ignore non-nodes (#1)')
     // @ts-expect-error runtime.
-    t.equal(toHtml(sanitize(null)), '', 'should ignore non-nodes (#2)')
+    assert.equal(toHtml(sanitize(null)), '', 'should ignore non-nodes (#2)')
     // @ts-expect-error runtime.
-    t.equal(toHtml(sanitize(1)), '', 'should ignore non-nodes (#3)')
+    assert.equal(toHtml(sanitize(1)), '', 'should ignore non-nodes (#3)')
     // @ts-expect-error runtime.
-    t.equal(toHtml(sanitize([])), '', 'should ignore non-nodes (#4)')
-
-    t.end()
+    assert.equal(toHtml(sanitize([])), '', 'should ignore non-nodes (#4)')
   })
 
-  t.test('unknown nodes', (t) => {
-    t.equal(
+  await t.test('unknown nodes', () => {
+    assert.equal(
       // @ts-expect-error runtime.
       toHtml(sanitize(u('unknown', '<xml></xml>'))),
       '',
       'should ignore unknown nodes'
     )
-
-    t.end()
   })
 
-  t.test('ignored nodes', (t) => {
-    t.equal(
+  await t.test('ignored nodes', () => {
+    assert.equal(
       // @ts-expect-error runtime.
       toHtml(sanitize(u('raw', '<xml></xml>'))),
       '',
       'should ignore `raw`'
     )
 
-    t.equal(
+    assert.equal(
       // @ts-expect-error runtime.
       toHtml(sanitize(u('directive', {name: '!alpha'}, '!alpha bravo'))),
       '',
       'should ignore declaration `directive`s'
     )
 
-    t.equal(
+    assert.equal(
       // @ts-expect-error runtime.
       toHtml(sanitize(u('directive', {name: '?xml'}, '?xml version="1.0"'))),
       '',
       'should ignore processing instruction `directive`s'
     )
 
-    t.equal(
+    assert.equal(
       // @ts-expect-error runtime.
       toHtml(sanitize(u('characterData', 'alpha'))),
       '',
       'should ignore `characterData`s'
     )
-
-    t.end()
   })
 
-  t.test('`comment`', (t) => {
-    t.equal(
+  await t.test('`comment`', () => {
+    assert.equal(
       toHtml(sanitize(u('comment', 'alpha'))),
       '',
       'should ignore `comment`s by default'
     )
 
-    t.equal(
+    assert.equal(
       toHtml(sanitize(u('comment', 'alpha'), {allowComments: true})),
       '<!--alpha-->',
       'should allow `comment`s with `allowComments: true`'
     )
 
-    t.equal(
+    assert.equal(
       // @ts-expect-error runtime.
       toHtml(sanitize(u('comment', {toString}), {allowComments: true})),
       '<!---->',
       'should ignore non-string `value`s with `allowComments: true`'
     )
 
-    t.equal(
+    assert.equal(
       toHtml(
         sanitize(u('comment', 'alpha--><script>alert(1)</script><!--bravo'), {
           allowComments: true
@@ -95,30 +88,26 @@ test('sanitize()', (t) => {
       '<!--alpha-->',
       'should not break out of comments with `allowComments: true`'
     )
-
-    t.end()
   })
 
-  t.test('`doctype`', (t) => {
-    t.equal(
+  await t.test('`doctype`', () => {
+    assert.equal(
       toHtml(sanitize(u('doctype', {name: 'html'}, 'alpha'))),
       '',
       'should ignore `doctype`s by default'
     )
 
-    t.equal(
+    assert.equal(
       toHtml(
         sanitize(u('doctype', {name: 'html'}, 'alpha'), {allowDoctypes: true})
       ),
       '<!doctype html>',
       'should allow `doctype`s with `allowDoctypes: true`'
     )
-
-    t.end()
   })
 
-  t.test('`text`', (t) => {
-    t.deepEqual(
+  await t.test('`text`', () => {
+    assert.deepEqual(
       sanitize({
         type: 'text',
         // @ts-expect-error: runtime.
@@ -145,36 +134,34 @@ test('sanitize()', (t) => {
       'should allow known properties'
     )
 
-    t.equal(
+    assert.equal(
       toHtml(sanitize(u('text', 'alert(1)'))),
       'alert(1)',
       'should allow `text`'
     )
 
-    t.equal(
+    assert.equal(
       // @ts-expect-error runtime.
       toHtml(sanitize(u('text', {toString}))),
       '',
       'should ignore non-string `value`s'
     )
 
-    t.equal(
+    assert.equal(
       toHtml(sanitize(h('script', u('text', 'alert(1)')))),
       '',
       'should ignore `text` in `script` elements'
     )
 
-    t.equal(
+    assert.equal(
       toHtml(sanitize(h('style', u('text', 'alert(1)')))),
       'alert(1)',
       'should show `text` in `style` elements'
     )
-
-    t.end()
   })
 
-  t.test('`element`', (t) => {
-    t.deepEqual(
+  await t.test('`element`', async (t) => {
+    assert.deepEqual(
       sanitize({
         type: 'element',
         tagName: 'div',
@@ -203,13 +190,13 @@ test('sanitize()', (t) => {
       'should allow known properties'
     )
 
-    t.deepEqual(
+    assert.deepEqual(
       sanitize(h('unknown', u('text', 'alert(1)'))),
       u('text', 'alert(1)'),
       'should ignore unknown elements'
     )
 
-    t.deepEqual(
+    assert.deepEqual(
       // @ts-expect-error runtime.
       sanitize({
         type: 'element',
@@ -220,74 +207,74 @@ test('sanitize()', (t) => {
       'should ignore elements without name'
     )
 
-    t.deepEqual(
+    assert.deepEqual(
       // @ts-expect-error runtime.
       sanitize({type: 'element', tagName: 'div'}),
       h(''),
       'should support elements without children / properties'
     )
 
-    t.deepEqual(
+    assert.deepEqual(
       sanitize(h('unknown', [])),
       u('root', []),
       'should always return a valid node (#1)'
     )
 
-    t.deepEqual(
+    assert.deepEqual(
       sanitize(h('script', [])),
       u('root', []),
       'should always return a valid node (#2)'
     )
 
-    t.deepEqual(
+    assert.deepEqual(
       sanitize(h('div', h('style', [u('text', '1'), u('text', '2')]))),
       h('div', [u('text', '1'), u('text', '2')]),
       'should always return a valid node (#3)'
     )
 
-    t.deepEqual(
+    assert.deepEqual(
       sanitize(h('unknown', [u('text', 'value')])),
       u('text', 'value'),
       'should always return a valid node (#4)'
     )
 
-    t.deepEqual(
+    assert.deepEqual(
       sanitize(h('unknown', [u('text', '1'), u('text', '2')])),
       u('root', [u('text', '1'), u('text', '2')]),
       'should always return a valid node (#5)'
     )
 
-    t.deepEqual(
+    assert.deepEqual(
       sanitize(h('div', {alt: 'alpha'})),
       h('div', {alt: 'alpha'}),
       'should allow known generic properties'
     )
 
-    t.deepEqual(
+    assert.deepEqual(
       sanitize(h('a', {href: '#heading'})),
       h('a', {href: '#heading'}),
       'should allow specific properties'
     )
 
-    t.deepEqual(
+    assert.deepEqual(
       sanitize(h('img', {href: '#heading'})),
       h('img'),
       'should ignore mismatched specific properties'
     )
 
-    t.deepEqual(
+    assert.deepEqual(
       sanitize(h('div', {dataFoo: 'bar'})),
       h('div'),
       'should ignore unspecified properties'
     )
 
-    t.deepEqual(
+    assert.deepEqual(
       sanitize(h('div', {dataFoo: 'bar'})),
       h('div'),
       'should ignore unspecified properties'
     )
 
-    t.deepEqual(
+    assert.deepEqual(
       sanitize(
         h('div', {dataFoo: 'bar'}),
         deepmerge(defaultSchema, {attributes: {'*': ['data*']}})
@@ -296,58 +283,58 @@ test('sanitize()', (t) => {
       'should allow `data*`'
     )
 
-    t.deepEqual(
+    assert.deepEqual(
       sanitize(h('img', {alt: 'hello'})),
       h('img', {alt: 'hello'}),
       'should allow `string`s'
     )
 
-    t.deepEqual(
+    assert.deepEqual(
       sanitize(h('img', {alt: true})),
       h('img', {alt: true}),
       'should allow `boolean`s'
     )
 
-    t.deepEqual(
+    assert.deepEqual(
       sanitize(h('img', {alt: 1})),
       h('img', {alt: 1}),
       'should allow `number`s'
     )
 
-    t.deepEqual(
+    assert.deepEqual(
       // @ts-expect-error runtime.
       sanitize(u('element', {tagName: 'img', properties: {alt: null}})),
       h('img'),
       'should ignore `null`'
     )
 
-    t.deepEqual(
+    assert.deepEqual(
       // @ts-expect-error runtime.
       sanitize(u('element', {tagName: 'img', properties: {alt: undefined}})),
       h('img'),
       'should ignore `undefined`'
     )
 
-    t.deepEqual(
+    assert.deepEqual(
       sanitize(h('div', {id: 'getElementById'})),
       h('div', {id: 'user-content-getElementById'}),
       'should prevent clobbering (#1)'
     )
 
-    t.deepEqual(
+    assert.deepEqual(
       sanitize(h('div', {name: 'getElementById'})),
       h('div', {name: 'user-content-getElementById'}),
       'should prevent clobbering (#2)'
     )
 
-    t.deepEqual(
+    assert.deepEqual(
       // @ts-expect-error runtime.
       sanitize(u('element', {tagName: 'img', properties: {alt: {toString}}})),
       h('img'),
       'should ignore objects'
     )
 
-    t.deepEqual(
+    assert.deepEqual(
       sanitize(
         // @ts-expect-error runtime.
         u('element', {
@@ -360,14 +347,14 @@ test('sanitize()', (t) => {
       'should supports arrays'
     )
 
-    t.deepEqual(
+    assert.deepEqual(
       sanitize(s('svg', {viewBox: '0 0 50 50'}, '!')),
       u('text', '!'),
       'should ignore `svg` elements'
     )
 
-    t.test('href`', (t) => {
-      testAllUrls(t, 'a', 'href', {
+    await t.test('href`', () => {
+      testAllUrls('a', 'href', {
         valid: {
           anchor: '#heading',
           relative: '/file.html',
@@ -388,12 +375,10 @@ test('sanitize()', (t) => {
           'data URL': 'data:,evilnastystuff'
         }
       })
-
-      t.end()
     })
 
-    t.test('`cite`', (t) => {
-      testAllUrls(t, 'blockquote', 'cite', {
+    await t.test('`cite`', () => {
+      testAllUrls('blockquote', 'cite', {
         valid: {
           anchor: '#heading',
           relative: '/file.html',
@@ -413,12 +398,10 @@ test('sanitize()', (t) => {
           'data URL': 'data:,evilnastystuff'
         }
       })
-
-      t.end()
     })
 
-    t.test('`src`', (t) => {
-      testAllUrls(t, 'img', 'src', {
+    await t.test('`src`', () => {
+      testAllUrls('img', 'src', {
         valid: {
           anchor: '#heading',
           relative: '/file.html',
@@ -438,12 +421,10 @@ test('sanitize()', (t) => {
           'data URL': 'data:,evilnastystuff'
         }
       })
-
-      t.end()
     })
 
-    t.test('`longDesc`', (t) => {
-      testAllUrls(t, 'img', 'longDesc', {
+    await t.test('`longDesc`', () => {
+      testAllUrls('img', 'longDesc', {
         valid: {
           anchor: '#heading',
           relative: '/file.html',
@@ -463,42 +444,38 @@ test('sanitize()', (t) => {
           'data URL': 'data:,evilnastystuff'
         }
       })
-
-      t.end()
     })
 
-    t.test('`li`', (t) => {
-      t.deepEqual(
+    await t.test('`li`', () => {
+      assert.deepEqual(
         sanitize(h('li', 'alert(1)')),
         h('li', 'alert(1)'),
         'should allow `li` outside list'
       )
 
-      t.deepEqual(
+      assert.deepEqual(
         sanitize(h('ol', h('li', 'alert(1)'))),
         h('ol', h('li', 'alert(1)')),
         'should allow `li` in `ol`'
       )
 
-      t.deepEqual(
+      assert.deepEqual(
         sanitize(h('ul', h('li', 'alert(1)'))),
         h('ul', h('li', 'alert(1)')),
         'should allow `li` in `ul`'
       )
 
-      t.deepEqual(
+      assert.deepEqual(
         sanitize(h('ol', h('div', h('li', 'alert(1)')))),
         h('ol', h('div', h('li', 'alert(1)'))),
         'should allow `li` descendant `ol`'
       )
 
-      t.deepEqual(
+      assert.deepEqual(
         sanitize(h('ul', h('div', h('li', 'alert(1)')))),
         h('ul', h('div', h('li', 'alert(1)'))),
         'should allow `li` descendant `ul`'
       )
-
-      t.end()
     })
 
     const tableNames = ['tr', 'td', 'th', 'tbody', 'thead', 'tfoot']
@@ -506,78 +483,76 @@ test('sanitize()', (t) => {
 
     while (++index < tableNames.length) {
       const name = tableNames[index]
-      t.test('`' + name + '`', (t) => {
-        t.deepEqual(
+      await t.test('`' + name + '`', () => {
+        assert.deepEqual(
           sanitize(h(name, 'alert(1)')),
           u('text', 'alert(1)'),
           'should not allow `' + name + '` outside `table`'
         )
 
-        t.deepEqual(
+        assert.deepEqual(
           sanitize(h('table', h(name, 'alert(1)'))),
           h('table', h(name, 'alert(1)')),
           'should allow `' + name + '` in `table`'
         )
 
-        t.deepEqual(
+        assert.deepEqual(
           sanitize(h('table', h('div', h(name, 'alert(1)')))),
           h('table', h('div', h(name, 'alert(1)'))),
           'should allow `' + name + '` descendant `table`'
         )
-
-        t.end()
       })
     }
 
-    t.deepEqual(
+    assert.deepEqual(
       sanitize(h('input')),
       h('input', {type: 'checkbox', disabled: true}),
       'should allow only disabled checkbox inputs'
     )
 
-    t.deepEqual(
+    assert.deepEqual(
       sanitize(h('input', {type: 'text'})),
       h('input', {type: 'checkbox', disabled: true}),
       'should not allow text inputs'
     )
 
-    t.deepEqual(
+    assert.deepEqual(
       sanitize(h('input', {type: 'checkbox', disabled: false})),
       h('input', {type: 'checkbox', disabled: true}),
       'should not allow enabled inputs'
     )
 
-    t.deepEqual(
+    assert.deepEqual(
       sanitize(h('ol', [h('li')])),
       h('ol', [h('li')]),
       'should allow list items'
     )
 
-    t.deepEqual(
+    assert.deepEqual(
       sanitize(h('ol', [h('li', {className: ['foo', 'bar']})])),
       h('ol', [h('li', {className: []})]),
       'should not allow classes on list items'
     )
 
-    t.deepEqual(
+    assert.deepEqual(
       sanitize(h('ol', [h('li', {className: ['foo', 'task-list-item']})])),
       h('ol', [h('li', {className: ['task-list-item']})]),
       'should only allow `task-list-item` as a class on list items'
     )
 
-    t.deepEqual(
+    assert.deepEqual(
       sanitize(h('select')),
       u('root', []),
       'should ignore some elements by default'
     )
 
-    t.deepEqual(
+    assert.deepEqual(
       sanitize(h('select'), deepmerge(defaultSchema, {tagNames: ['select']})),
       h('select'),
       'should support allowing elements through the schema'
     )
 
-    t.deepEqual(
+    assert.deepEqual(
       sanitize(
         h('select', {autoComplete: true}),
         deepmerge(defaultSchema, {tagNames: ['select']})
@@ -586,7 +561,7 @@ test('sanitize()', (t) => {
       'should ignore attributes for new elements'
     )
 
-    t.deepEqual(
+    assert.deepEqual(
       sanitize(
         h('select', {autoComplete: true}),
         deepmerge(defaultSchema, {
@@ -598,7 +573,7 @@ test('sanitize()', (t) => {
       'should support allowing attributes for new elements through the schema'
     )
 
-    t.deepEqual(
+    assert.deepEqual(
       sanitize(
         h('div', [h('select', {form: 'one'}), h('select', {form: 'two'})]),
         deepmerge(defaultSchema, {
@@ -610,7 +585,7 @@ test('sanitize()', (t) => {
       'should support a list of valid values on new attributes'
     )
 
-    t.deepEqual(
+    assert.deepEqual(
       sanitize(
         h('div', [
           h('span', {className: 'a-one'}),
@@ -634,7 +609,7 @@ test('sanitize()', (t) => {
       'should support RegExp in the list of valid values'
     )
 
-    t.deepEqual(
+    assert.deepEqual(
       sanitize(
         h('div', [
           h('select', {form: 'alpha'}),
@@ -657,7 +632,7 @@ test('sanitize()', (t) => {
       'should support required attributes'
     )
 
-    t.deepEqual(
+    assert.deepEqual(
       sanitize(h('div', h('li', 'text')), {
         tagNames: ['div', 'ul', 'li'],
         ancestors: {li: ['ul']}
@@ -665,12 +640,10 @@ test('sanitize()', (t) => {
       h('div', 'text'),
       'should support `ancestors` to enforce certain ancestors (rehypejs/rehype-sanitize#8)'
     )
-
-    t.end()
   })
 
-  t.test('`root`', (t) => {
-    t.deepEqual(
+  await t.test('`root`', () => {
+    assert.deepEqual(
       sanitize({
         type: 'root',
         // @ts-expect-error: runtime.
@@ -697,7 +670,7 @@ test('sanitize()', (t) => {
       'should allow known properties'
     )
 
-    t.deepEqual(
+    assert.deepEqual(
       sanitize(u('root', [h('div', h('li', 'text'))]), {
         tagNames: ['div', 'ul', 'li'],
         ancestors: {li: ['ul']}
@@ -705,11 +678,7 @@ test('sanitize()', (t) => {
       u('root', [h('div', 'text')]),
       'should support `ancestors` to enforce certain ancestors in a `root` (rehypejs/rehype-sanitize#8)'
     )
-
-    t.end()
   })
-
-  t.end()
 })
 
 // Coverage.
@@ -723,26 +692,24 @@ function toString() {
 /**
  * Test `valid` and `invalid` `url`s in `prop` on `tagName`.
  *
- * @param {import('tape').Test} t
  * @param {string} tagName
  * @param {string} prop
  * @param {{valid: Record<string, string>, invalid: Record<string, string>}} all
  */
-function testAllUrls(t, tagName, prop, all) {
-  testUrls(t, tagName, prop, all.valid, true)
-  testUrls(t, tagName, prop, all.invalid, false)
+function testAllUrls(tagName, prop, all) {
+  testUrls(tagName, prop, all.valid, true)
+  testUrls(tagName, prop, all.invalid, false)
 }
 
 /**
  * Test `valid` `url`s in `prop` on `tagName`.
  *
- * @param {import('tape').Test} t
  * @param {string} tagName
  * @param {string} prop
  * @param {Record<string, string>} urls
  * @param {boolean} valid
  */
-function testUrls(t, tagName, prop, urls, valid) {
+function testUrls(tagName, prop, urls, valid) {
   /** @type {string} */
   let name
 
@@ -750,7 +717,7 @@ function testUrls(t, tagName, prop, urls, valid) {
     if (own.call(urls, name)) {
       const props = {[prop]: urls[name]}
 
-      t.deepEqual(
+      assert.deepEqual(
         sanitize(h(tagName, props)),
         h(tagName, valid ? props : {}),
         'should ' + (valid ? 'allow' : 'clean') + ' ' + name
@@ -758,5 +725,3 @@ function testUrls(t, tagName, prop, urls, valid) {
     }
   }
 }
-
-/* eslint-enable no-script-url, max-params */
