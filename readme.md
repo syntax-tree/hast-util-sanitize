@@ -18,6 +18,7 @@
 *   [Use](#use)
 *   [API](#api)
     *   [`sanitize(tree[, schema])`](#sanitizetree-schema)
+    *   [`defaultSchema`](#defaultschema)
     *   [`Schema`](#schema)
 *   [Types](#types)
 *   [Compatibility](#compatibility)
@@ -43,7 +44,7 @@ sanitize HTML at a higher-level (easier) abstraction.
 ## Install
 
 This package is [ESM only][esm].
-In Node.js (version 14.14+, 16.0+), install with [npm][]:
+In Node.js (version 14.14+ and 16.0+), install with [npm][]:
 
 ```sh
 npm install hast-util-sanitize
@@ -116,7 +117,8 @@ Sanitized:
 
 ## API
 
-This package exports the identifiers `sanitize` and `defaultSchema`.
+This package exports the identifiers [`defaultSchema`][defaultschema] and
+[`sanitize`][sanitize].
 There is no default export.
 
 ### `sanitize(tree[, schema])`
@@ -125,22 +127,29 @@ Sanitize a tree.
 
 ###### Parameters
 
-*   `tree` ([`Node`][node]) — [*tree*][tree] to sanitize
-*   `schema` ([`Schema`][schema], optional) — schema defining how to sanitize
+*   `tree` ([`Node`][node])
+    — tree to clean
+*   `schema` ([`Schema`][schema], optional)
+    — schema defining how to sanitize
 
 ###### Returns
 
-A new, sanitized, tree ([`Node`][node]).
+New, sanitized, tree ([`Node`][node]).
+
+### `defaultSchema`
+
+Default schema ([`Schema`][schema]).
+
+Follows GitHub style sanitation.
 
 ### `Schema`
 
-Sanitation schema that defines if and how nodes and properties should be
-cleaned.
-The default schema is exported as `defaultSchema`, which defaults to [GitHub][]
-style sanitation.
-If any top-level key isn’t given, it defaults to GitHub’s style too.
+Schema that defines what nodes and properties are allowed (TypeScript type).
 
-For a thorough sample, see the code for [`defaultSchema`][default-schema].
+The default schema is [`defaultSchema`][defaultschema], which follows how
+[GitHub][] cleans.
+If any top-level key is missing in the given schema, the corresponding value
+of the default schema is used.
 
 To extend the standard schema with a few changes, clone `defaultSchema` like so:
 
@@ -163,15 +172,21 @@ console.log(tree)
 // }
 ```
 
+##### Fields
+
 ###### `attributes`
 
 Map of tag names to allowed [*property names*][name]
-(`Record<string, Array<string>>`).
+(`Record<string, Array<string | [string, ...Array<string | number | boolean | RegExp>]>`,
+optional).
 
-The special `'*'` key defines [*property names*][name] allowed on all
-[*elements*][element].
+The special key `'*'` as a tag name defines property names allowed on all
+elements.
 
-One special value, `'data*'`, can be used to allow all `data` properties.
+The special value `'data*'` as a property name can be used to allow all `data`
+properties.
+
+For example:
 
 ```js
 attributes: {
@@ -190,11 +205,16 @@ attributes: {
 }
 ```
 
-Instead of a single string (such as `type`), which allows any [*property
-value*][value] of that [*property name*][name], it’s also possible to provide
-an array (such as `['type', 'checkbox']` or `['className', /^hljs-/]`),
-where the first entry is the *property name*, and all other entries are
-*property values* allowed (or regular expressions that are tested with values).
+Instead of a single string, which allows any [*property value*][value] of that
+property name, it’s also possible to provide an array to allow several values.
+For example, `input: ['type']` allows the `type` attribute set to any value on
+inputs.
+But `input: [['type', 'checkbox', 'radio']]` allows `type` only when set to one
+of the allowed values (`'checkbox'` or `'radio'`).
+
+You can also use regexes, so for example `span: [['className', /^hljs-/]]`
+allows any class that starts with `hljs-` on `span` elements.
+
 This is how the default GitHub schema allows only disabled checkbox inputs:
 
 ```js
@@ -208,8 +228,8 @@ attributes: {
 }
 ```
 
-This also plays well with properties that accept space- or comma-separated
-values, such as `class`.
+Attributes also plays well with properties that accept space- or
+comma-separated values, such as `class`.
 Say you wanted to allow certain classes on `span` elements for syntax
 highlighting, that can be done like this:
 
@@ -224,13 +244,17 @@ span: [
 ###### `required`
 
 Map of tag names to required [*property names*][name] and their default
-[*property value*][value] (`Record<string, Record<string, *>>`).
-If the defined keys do not exist in an [*element*][element]’s
-[*properties*][properties], they are added and set to the specified value.
+[*property value*][value] (`Record<string, Record<string, unknown>>`,
+optional).
+
+If the defined keys do not exist in an element’s properties, they are added and
+set to the specified value.
 
 Note that properties are first checked based on the schema at `attributes`,
-so *properties* could be removed by that step and then added again through
+so properties could be removed by that step and then added again through
 `required`.
+
+For example:
 
 ```js
 required: {
@@ -240,7 +264,9 @@ required: {
 
 ###### `tagNames`
 
-List of allowed tag names (`Array<string>`).
+List of allowed tag names (`Array<string>`, optional).
+
+For example:
 
 ```js
 tagNames: [
@@ -256,8 +282,15 @@ tagNames: [
 
 ###### `protocols`
 
-Map of protocols to allow in [*property values*][value]
-(`Record<string, Array<string>>`).
+Map of [*property names*][name] to allowed protocols
+(`Record<string, Array<string>>`, optional).
+
+The listed property names can be set to URLs that are local (relative to the
+current website, such as `this`, `#this`, `/this`, or `?this`) or remote (such
+as `https://example.com`), in which case they must have a protocol that is
+allowed here.
+
+For example:
 
 ```js
 protocols: {
@@ -269,8 +302,13 @@ protocols: {
 
 ###### `ancestors`
 
-Map of tag names to their required [*ancestor*][ancestor] [*elements*][element]
-(`Record<string, Array<string>>`).
+Map of tag names to a list of tag names which are required ancestors
+(`Record<string, Array<string>>`, optional).
+
+Elements with these tag names will be ignored if they occur outside of one of
+their allowed parents.
+
+For example:
 
 ```js
 ancestors: {
@@ -282,7 +320,9 @@ ancestors: {
 
 ###### `clobber`
 
-List of allowed [*property names*][name] which can clobber (`Array<string>`).
+List of [*property names*][name] that clobber (`Array<string>`, optional).
+
+For example:
 
 ```js
 clobber: ['name', 'id']
@@ -290,7 +330,9 @@ clobber: ['name', 'id']
 
 ###### `clobberPrefix`
 
-Prefix to use before potentially clobbering [*property names*][name] (`string`).
+Prefix to use before clobbering properties (`string`, optional).
+
+For example:
 
 ```js
 clobberPrefix: 'user-content-'
@@ -298,11 +340,12 @@ clobberPrefix: 'user-content-'
 
 ###### `strip`
 
-Names of [*elements*][element] to strip from the [*tree*][tree]
-(`Array<string>`).
+List of tag names to strip from the tree (`Array<string>`, optional).
 
-By default, unsafe *elements* are replaced by their [*children*][child].
-Some *elements*, should however be entirely stripped from the *tree*.
+By default, unsafe elements are replaced by their children.
+Some elements should however be entirely stripped from the tree.
+
+For example:
 
 ```js
 strip: ['script']
@@ -310,7 +353,9 @@ strip: ['script']
 
 ###### `allowComments`
 
-Whether to allow [*comments*][comment] (`boolean`, default: `false`).
+Whether to allow comment nodes (`boolean`, default: `false`).
+
+For example:
 
 ```js
 allowComments: true
@@ -318,7 +363,7 @@ allowComments: true
 
 ###### `allowDoctypes`
 
-Whether to allow [*doctypes*][doctype] (`boolean`, default: `false`).
+Whether to allow doctype nodes (`boolean`, default: `false`).
 
 ```js
 allowDoctypes: true
@@ -327,7 +372,7 @@ allowDoctypes: true
 ## Types
 
 This package is fully typed with [TypeScript][].
-It exports the additional type `Schema`.
+It exports the additional type [`Schema`][schema].
 
 ## Compatibility
 
@@ -412,23 +457,9 @@ abide by its terms.
 
 [coc]: https://github.com/syntax-tree/.github/blob/main/code-of-conduct.md
 
-[tree]: https://github.com/syntax-tree/unist#tree
-
-[child]: https://github.com/syntax-tree/unist#child
-
-[ancestor]: https://github.com/syntax-tree/unist#ancestor
-
 [hast]: https://github.com/syntax-tree/hast
 
 [node]: https://github.com/syntax-tree/hast#nodes
-
-[element]: https://github.com/syntax-tree/hast#element
-
-[doctype]: https://github.com/syntax-tree/hast#doctype
-
-[comment]: https://github.com/syntax-tree/hast#comment
-
-[properties]: https://github.com/syntax-tree/hast#properties
 
 [name]: https://github.com/syntax-tree/hast#propertyname
 
@@ -438,8 +469,10 @@ abide by its terms.
 
 [xss]: https://en.wikipedia.org/wiki/Cross-site_scripting
 
-[default-schema]: lib/schema.js
+[rehype-sanitize]: https://github.com/rehypejs/rehype-sanitize
+
+[defaultschema]: #defaultschema
+
+[sanitize]: #sanitizetree-schema
 
 [schema]: #schema
-
-[rehype-sanitize]: https://github.com/rehypejs/rehype-sanitize
