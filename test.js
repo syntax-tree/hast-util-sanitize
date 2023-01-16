@@ -31,7 +31,9 @@ test('sanitize()', async (t) => {
 
   await t.test('ignored nodes', () => {
     assert.equal(
-      // @ts-expect-error runtime.
+      // Depending on which files are loaded (`mdast-util-to-hast`, `hast-util-raw`?)
+      // TS might allow this or not:
+      // @ts-ignore runtime.
       toHtml(sanitize(u('raw', '<xml></xml>'))),
       '',
       'should ignore `raw`'
