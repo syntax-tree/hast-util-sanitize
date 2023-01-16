@@ -5,10 +5,17 @@ import {h, s} from 'hastscript'
 import {u} from 'unist-builder'
 import deepmerge from 'deepmerge'
 import {sanitize, defaultSchema} from './index.js'
+import * as mod from './index.js'
 
 const own = {}.hasOwnProperty
 
 test('sanitize()', async (t) => {
+  assert.deepEqual(
+    Object.keys(mod).sort(),
+    ['defaultSchema', 'sanitize'],
+    'should expose the public api'
+  )
+
   await t.test('non-node', () => {
     // @ts-expect-error runtime.
     assert.equal(toHtml(sanitize(true)), '', 'should ignore non-nodes (#1)')
