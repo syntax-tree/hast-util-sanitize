@@ -57,19 +57,33 @@
     "build": "tsc --build --clean && tsc --build && type-coverage",
     "format": "remark . -qfo && prettier . -w --log-level warn && xo --fix",
     "test-api": "node --conditions development test.js",
-    "test-coverage": "c8 --check-coverage --100 --reporter lcov npm run test-api",
+    "test-coverage": "c8 --100 --reporter lcov npm run test-api",
     "test": "npm run build && npm run format && npm run test-coverage"
   },
   "prettier": {
-    "tabWidth": 2,
-    "useTabs": false,
-    "singleQuote": true,
     "bracketSpacing": false,
     "semi": false,
-    "trailingComma": "none"
+    "singleQuote": true,
+    "tabWidth": 2,
+    "trailingComma": "none",
+    "useTabs": false
+  },
+  "remarkConfig": {
+    "plugins": [
+      "remark-preset-wooorm"
+    ]
+  },
+  "typeCoverage": {
+    "atLeast": 100,
+    "detail": true,
+    "ignoreCatch": true,
+    "#": "Couple of needed `any`s",
+    "ignoreFiles": [
+      "lib/index.d.ts"
+    ],
+    "strict": true
   },
   "xo": {
-    "prettier": true,
     "overrides": [
       {
         "files": [
@@ -80,21 +94,7 @@
           "no-script-url": 0
         }
       }
-    ]
-  },
-  "remarkConfig": {
-    "plugins": [
-      "preset-wooorm"
-    ]
-  },
-  "typeCoverage": {
-    "atLeast": 100,
-    "detail": true,
-    "strict": true,
-    "ignoreCatch": true,
-    "#": "Couple of needed `any`s",
-    "ignoreFiles": [
-      "lib/index.d.ts"
-    ]
+    ],
+    "prettier": true
   }
 }
