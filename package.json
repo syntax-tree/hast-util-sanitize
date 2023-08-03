@@ -43,23 +43,28 @@
   "devDependencies": {
     "@types/node": "^20.0.0",
     "@types/ungap__structured-clone": "^0.3.0",
+    "aria-attributes": "^2.0.0",
     "c8": "^8.0.0",
     "deepmerge": "^4.0.0",
+    "hast-util-from-html": "^1.0.0",
     "hast-util-to-html": "^8.0.0",
     "hastscript": "^8.0.0",
+    "html-element-attributes": "^3.0.0",
+    "html-tag-names": "^2.0.0",
     "prettier": "^3.0.0",
     "remark-cli": "^11.0.0",
     "remark-preset-wooorm": "^9.0.0",
     "type-coverage": "^2.0.0",
     "typescript": "^5.0.0",
     "unist-builder": "^4.0.0",
+    "unist-util-visit": "^5.0.0",
     "xo": "^0.55.0"
   },
   "scripts": {
     "prepack": "npm run build && npm run format",
     "build": "tsc --build --clean && tsc --build && type-coverage",
     "format": "remark . -qfo && prettier . -w --log-level warn && xo --fix",
-    "test-api": "node --conditions development test.js",
+    "test-api": "node --conditions development test/index.js",
     "test-coverage": "c8 --100 --reporter lcov npm run test-api",
     "test": "npm run build && npm run format && npm run test-coverage"
   },
@@ -90,7 +95,7 @@
     "overrides": [
       {
         "files": [
-          "test.js"
+          "test/**/*.js"
         ],
         "rules": {
           "max-nested-callbacks": "off",
