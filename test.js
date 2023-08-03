@@ -1,134 +1,149 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
-import {toHtml} from 'hast-util-to-html'
-import {h, s} from 'hastscript'
-import {u} from 'unist-builder'
 import deepmerge from 'deepmerge'
-import {sanitize, defaultSchema} from './index.js'
-import * as mod from './index.js'
+import {h, s} from 'hastscript'
+import {toHtml} from 'hast-util-to-html'
+import {u} from 'unist-builder'
+import {defaultSchema, sanitize} from './index.js'
 
 const own = {}.hasOwnProperty
 
-test('sanitize()', async (t) => {
-  assert.deepEqual(
-    Object.keys(mod).sort(),
-    ['defaultSchema', 'sanitize'],
-    'should expose the public api'
-  )
-
-  await t.test('non-node', () => {
-    // @ts-expect-error runtime.
-    assert.equal(toHtml(sanitize(true)), '', 'should ignore non-nodes (#1)')
-    // @ts-expect-error runtime.
-    assert.equal(toHtml(sanitize(null)), '', 'should ignore non-nodes (#2)')
-    // @ts-expect-error runtime.
-    assert.equal(toHtml(sanitize(1)), '', 'should ignore non-nodes (#3)')
-    // @ts-expect-error runtime.
-    assert.equal(toHtml(sanitize([])), '', 'should ignore non-nodes (#4)')
+test('sanitize()', async function (t) {
+  await t.test('should expose the public api', async function () {
+    assert.deepEqual(Object.keys(await import('./index.js')).sort(), [
+      'defaultSchema',
+      'sanitize'
+    ])
   })
 
-  await t.test('unknown nodes', () => {
+  await t.test('should ignore non-nodes (#1)', async function () {
     assert.equal(
       toHtml(
-        // @ts-expect-error runtime.
-        sanitize(u('unknown', '<xml></xml>'))
+        // @ts-expect-error: check how a non-node is handled.
+        sanitize(true)
       ),
-      '',
-      'should ignore unknown nodes'
+      ''
     )
   })
 
-  await t.test('ignored nodes', () => {
-    assert.equal(
-      // Depending on which files are loaded (`mdast-util-to-hast`, `hast-util-raw`?)
-      // TS might allow this or not:
-      // @ts-ignore runtime.
-      toHtml(sanitize(u('raw', '<xml></xml>'))),
-      '',
-      'should ignore `raw`'
-    )
-
+  await t.test('should ignore non-nodes (#2)', async function () {
     assert.equal(
       toHtml(
-        // @ts-expect-error: no longer a hast node.
-        sanitize(u('directive', {name: '!alpha'}, '!alpha bravo'))
+        // @ts-expect-error: check how a non-node is handled.
+        sanitize(undefined)
       ),
-      '',
-      'should ignore declaration `directive`s'
-    )
-
-    assert.equal(
-      // @ts-expect-error runtime.
-      toHtml(sanitize(u('directive', {name: '?xml'}, '?xml version="1.0"'))),
-      '',
-      'should ignore processing instruction `directive`s'
-    )
-
-    assert.equal(
-      // @ts-expect-error runtime.
-      toHtml(sanitize(u('characterData', 'alpha'))),
-      '',
-      'should ignore `characterData`s'
+      ''
     )
   })
 
-  await t.test('`comment`', () => {
+  await t.test('should ignore non-nodes (#3)', async function () {
     assert.equal(
-      // @ts-expect-error: remove when `hast-util-to-html` updates.
-      toHtml(sanitize(u('comment', 'alpha'))),
-      '',
-      'should ignore `comment`s by default'
+      toHtml(
+        // @ts-expect-error: check how a non-node is handled.
+        sanitize({type: 1})
+      ),
+      ''
     )
+  })
 
-    assert.equal(
-      // @ts-expect-error: remove when `hast-util-to-html` updates.
-      toHtml(sanitize(u('comment', 'alpha'), {allowComments: true})),
-      '<!--alpha-->',
-      'should allow `comment`s with `allowComments: true`'
-    )
-
-    assert.equal(
-      // @ts-expect-error runtime.
-      toHtml(sanitize(u('comment', {toString}), {allowComments: true})),
-      '<!---->',
-      'should ignore non-string `value`s with `allowComments: true`'
-    )
-
+  await t.test('should ignore unknown nodes', async function () {
     assert.equal(
       toHtml(
         // @ts-expect-error: remove when `hast-util-to-html` updates.
-        sanitize(u('comment', 'alpha--><script>alert(1)</script><!--bravo'), {
-          allowComments: true
-        })
+        sanitize(
+          // @ts-expect-error: check how an unknown node is
+          u('unknown', '<xml></xml>')
+        )
       ),
-      '<!--alpha-->',
-      'should not break out of comments with `allowComments: true`'
+      ''
+    )
+  })
+})
+
+test('`comment`', async function (t) {
+  await t.test('should ignore `comment`s by default', async function () {
+    assert.equal(
+      toHtml(
+        // @ts-expect-error: remove when `hast-util-to-html` updates.
+        sanitize(u('comment', 'alpha'))
+      ),
+      ''
     )
   })
 
-  await t.test('`doctype`', () => {
+  await t.test(
+    'should allow `comment`s with `allowComments: true`',
+    async function () {
+      assert.equal(
+        toHtml(
+          // @ts-expect-error: remove when `hast-util-to-html` updates.
+          sanitize(u('comment', 'alpha'), {allowComments: true})
+        ),
+        '<!--alpha-->'
+      )
+    }
+  )
+
+  await t.test(
+    'should ignore non-string `value`s with `allowComments: true`',
+    async function () {
+      assert.equal(
+        toHtml(
+          // @ts-expect-error: check how non-string `value` is handled.
+          sanitize({type: 'comment', value: {toString}}, {allowComments: true})
+        ),
+        '<!---->'
+      )
+    }
+  )
+
+  await t.test(
+    'should not break out of comments with `allowComments: true`',
+    async function () {
+      assert.equal(
+        toHtml(
+          // @ts-expect-error: remove when `hast-util-to-html` updates.
+          sanitize(u('comment', 'alpha--><script>alert(1)</script><!--bravo'), {
+            allowComments: true
+          })
+        ),
+        '<!--alpha-->'
+      )
+    }
+  )
+})
+
+test('`doctype`', async function (t) {
+  await t.test('should ignore `doctype`s by default', async function () {
     assert.equal(
       // @ts-expect-error: remove when `hast-util-to-html` updates.
       toHtml(sanitize(u('doctype', {name: 'html'}, 'alpha'))),
-      '',
-      'should ignore `doctype`s by default'
-    )
-
-    assert.equal(
-      toHtml(
-        // @ts-expect-error: remove when `hast-util-to-html` updates.
-        sanitize(u('doctype', {name: 'html'}, 'alpha'), {allowDoctypes: true})
-      ),
-      '<!doctype html>',
-      'should allow `doctype`s with `allowDoctypes: true`'
+      ''
     )
   })
 
-  await t.test('`text`', () => {
+  await t.test(
+    'should allow `doctype`s with `allowDoctypes: true`',
+    async function () {
+      assert.equal(
+        toHtml(
+          // @ts-expect-error: remove when `hast-util-to-html` updates.
+          sanitize(u('doctype', {name: 'html'}, 'alpha'), {
+            allowDoctypes: true
+          })
+        ),
+        '<!doctype html>'
+      )
+    }
+  )
+})
+
+test('`text`', async function (t) {
+  await t.test('should allow known properties', async function () {
     assert.deepEqual(
       sanitize({
         type: 'text',
-        // @ts-expect-error: runtime.
+        // @ts-expect-error: check how unknown properties on `text` are handled.
         tagName: 'div',
         value: 'alert(1)',
         unknown: 'alert(1)',
@@ -145,48 +160,57 @@ test('sanitize()', async (t) => {
         value: 'alert(1)',
         data: {href: 'alert(1)'},
         position: {
-          start: {line: 1, column: 1},
-          end: {line: 2, column: 1}
+          start: {line: 1, column: 1, offset: undefined},
+          end: {line: 2, column: 1, offset: undefined}
         }
-      },
-      'should allow known properties'
-    )
-
-    assert.equal(
-      // @ts-expect-error: remove when `hast-util-to-html` updates.
-      toHtml(sanitize(u('text', 'alert(1)'))),
-      'alert(1)',
-      'should allow `text`'
-    )
-
-    assert.equal(
-      // @ts-expect-error runtime.
-      toHtml(sanitize(u('text', {toString}))),
-      '',
-      'should ignore non-string `value`s'
-    )
-
-    assert.equal(
-      // @ts-expect-error: remove when `hast-util-to-html` updates.
-      toHtml(sanitize(h('script', u('text', 'alert(1)')))),
-      '',
-      'should ignore `text` in `script` elements'
-    )
-
-    assert.equal(
-      // @ts-expect-error: remove when `hast-util-to-html` updates.
-      toHtml(sanitize(h('style', u('text', 'alert(1)')))),
-      'alert(1)',
-      'should show `text` in `style` elements'
+      }
     )
   })
 
-  await t.test('`element`', async (t) => {
+  await t.test('should allow `text`', async function () {
+    assert.equal(
+      // @ts-expect-error: remove when `hast-util-to-html` updates.
+      toHtml(sanitize(u('text', 'alert(1)'))),
+      'alert(1)'
+    )
+  })
+
+  await t.test('should ignore non-string `value`s', async function () {
+    assert.equal(
+      // @ts-expect-error: check how non-string `value` is handled.
+      toHtml(sanitize({type: 'text', value: {toString}})),
+      ''
+    )
+  })
+
+  await t.test('should ignore `text` in `script` elements', async function () {
+    assert.equal(
+      toHtml(
+        // @ts-expect-error: remove when `hast-util-to-html` updates.
+        sanitize(h('script', u('text', 'alert(1)')))
+      ),
+      ''
+    )
+  })
+
+  await t.test('should show `text` in `style` elements', async function () {
+    assert.equal(
+      toHtml(
+        // @ts-expect-error: remove when `hast-util-to-html` updates.
+        sanitize(h('style', u('text', 'alert(1)')))
+      ),
+      'alert(1)'
+    )
+  })
+})
+
+test('`element`', async function (t) {
+  await t.test('should allow known properties', async function () {
     assert.deepEqual(
       sanitize({
         type: 'element',
         tagName: 'div',
-        // @ts-expect-error: runtime.
+        // @ts-expect-error: check how unknown properties are handled.
         value: 'alert(1)',
         unknown: 'alert(1)',
         properties: {href: 'javascript:alert(1)'},
@@ -204,432 +228,501 @@ test('sanitize()', async (t) => {
         children: [],
         data: {href: 'alert(1)'},
         position: {
-          start: {line: 1, column: 1},
-          end: {line: 2, column: 1}
+          start: {line: 1, column: 1, offset: undefined},
+          end: {line: 2, column: 1, offset: undefined}
         }
-      },
-      'should allow known properties'
+      }
     )
+  })
 
+  await t.test('should ignore unknown elements', async function () {
     assert.deepEqual(
       sanitize(h('unknown', u('text', 'alert(1)'))),
-      u('text', 'alert(1)'),
-      'should ignore unknown elements'
+      u('text', 'alert(1)')
     )
+  })
 
+  await t.test('should ignore elements without name', async function () {
     assert.deepEqual(
-      // @ts-expect-error runtime.
-      sanitize({
-        type: 'element',
-        properties: {},
-        children: [u('text', 'alert(1)')]
-      }),
-      u('text', 'alert(1)'),
-      'should ignore elements without name'
+      sanitize(
+        // @ts-expect-error: check how missing `tagName` is handled.
+        {
+          type: 'element',
+          properties: {},
+          children: [u('text', 'alert(1)')]
+        }
+      ),
+      u('text', 'alert(1)')
     )
+  })
 
-    assert.deepEqual(
-      // @ts-expect-error runtime.
-      sanitize({type: 'element', tagName: 'div'}),
-      h(''),
-      'should support elements without children / properties'
-    )
+  await t.test(
+    'should support elements without children / properties',
+    async function () {
+      assert.deepEqual(
+        sanitize(
+          // @ts-expect-error: check how missing `children`, `properties` is handled.
+          {type: 'element', tagName: 'div'}
+        ),
+        h('')
+      )
+    }
+  )
 
-    assert.deepEqual(
-      sanitize(h('unknown', [])),
-      u('root', []),
-      'should always return a valid node (#1)'
-    )
+  await t.test('should always return a valid node (#1)', async function () {
+    assert.deepEqual(sanitize(h('unknown', [])), u('root', []))
+  })
 
-    assert.deepEqual(
-      sanitize(h('script', [])),
-      u('root', []),
-      'should always return a valid node (#2)'
-    )
+  await t.test('should always return a valid node (#2)', async function () {
+    assert.deepEqual(sanitize(h('script', [])), u('root', []))
+  })
 
+  await t.test('should always return a valid node (#3)', async function () {
     assert.deepEqual(
       sanitize(h('div', h('style', [u('text', '1'), u('text', '2')]))),
-      h('div', [u('text', '1'), u('text', '2')]),
-      'should always return a valid node (#3)'
+      h('div', [u('text', '1'), u('text', '2')])
     )
+  })
 
+  await t.test('should always return a valid node (#4)', async function () {
     assert.deepEqual(
       sanitize(h('unknown', [u('text', 'value')])),
-      u('text', 'value'),
-      'should always return a valid node (#4)'
+      u('text', 'value')
     )
+  })
 
+  await t.test('should always return a valid node (#5)', async function () {
     assert.deepEqual(
       sanitize(h('unknown', [u('text', '1'), u('text', '2')])),
-      u('root', [u('text', '1'), u('text', '2')]),
-      'should always return a valid node (#5)'
+      u('root', [u('text', '1'), u('text', '2')])
     )
+  })
 
+  await t.test('should allow known generic properties', async function () {
     assert.deepEqual(
       sanitize(h('div', {alt: 'alpha'})),
-      h('div', {alt: 'alpha'}),
-      'should allow known generic properties'
+      h('div', {alt: 'alpha'})
     )
+  })
 
+  await t.test('should allow specific properties', async function () {
     assert.deepEqual(
       sanitize(h('a', {href: '#heading'})),
-      h('a', {href: '#heading'}),
-      'should allow specific properties'
+      h('a', {href: '#heading'})
     )
+  })
 
-    assert.deepEqual(
-      sanitize(h('img', {href: '#heading'})),
-      h('img'),
-      'should ignore mismatched specific properties'
-    )
+  await t.test(
+    'should ignore mismatched specific properties',
+    async function () {
+      assert.deepEqual(sanitize(h('img', {href: '#heading'})), h('img'))
+    }
+  )
 
-    assert.deepEqual(
-      sanitize(h('div', {dataFoo: 'bar'})),
-      h('div'),
-      'should ignore unspecified properties'
-    )
+  await t.test('should ignore unspecified properties', async function () {
+    assert.deepEqual(sanitize(h('div', {dataFoo: 'bar'})), h('div'))
+  })
 
-    assert.deepEqual(
-      sanitize(h('div', {dataFoo: 'bar'})),
-      h('div'),
-      'should ignore unspecified properties'
-    )
+  await t.test('should ignore unspecified properties', async function () {
+    assert.deepEqual(sanitize(h('div', {dataFoo: 'bar'})), h('div'))
+  })
 
+  await t.test('should allow `data*`', async function () {
     assert.deepEqual(
       sanitize(
         h('div', {dataFoo: 'bar'}),
         deepmerge(defaultSchema, {attributes: {'*': ['data*']}})
       ),
-      h('div', {dataFoo: 'bar'}),
-      'should allow `data*`'
+      h('div', {dataFoo: 'bar'})
     )
+  })
 
+  await t.test('should allow `string`s', async function () {
     assert.deepEqual(
       sanitize(h('img', {alt: 'hello'})),
-      h('img', {alt: 'hello'}),
-      'should allow `string`s'
+      h('img', {alt: 'hello'})
     )
+  })
 
+  await t.test('should allow `boolean`s', async function () {
+    assert.deepEqual(sanitize(h('img', {alt: true})), h('img', {alt: true}))
+  })
+
+  await t.test('should allow `number`s', async function () {
+    assert.deepEqual(sanitize(h('img', {alt: 1})), h('img', {alt: 1}))
+  })
+
+  await t.test('should ignore `null`', async function () {
     assert.deepEqual(
-      sanitize(h('img', {alt: true})),
-      h('img', {alt: true}),
-      'should allow `boolean`s'
+      sanitize({
+        type: 'element',
+        tagName: 'img',
+        properties: {alt: null},
+        children: []
+      }),
+      h('img')
     )
+  })
 
+  await t.test('should ignore `undefined`', async function () {
     assert.deepEqual(
-      sanitize(h('img', {alt: 1})),
-      h('img', {alt: 1}),
-      'should allow `number`s'
+      sanitize({
+        type: 'element',
+        tagName: 'img',
+        properties: {alt: undefined},
+        children: []
+      }),
+      h('img')
     )
+  })
 
-    assert.deepEqual(
-      // @ts-expect-error runtime.
-      sanitize(u('element', {tagName: 'img', properties: {alt: null}})),
-      h('img'),
-      'should ignore `null`'
-    )
-
-    assert.deepEqual(
-      // @ts-expect-error runtime.
-      sanitize(u('element', {tagName: 'img', properties: {alt: undefined}})),
-      h('img'),
-      'should ignore `undefined`'
-    )
-
+  await t.test('should prevent clobbering (#1)', async function () {
     assert.deepEqual(
       sanitize(h('div', {id: 'getElementById'})),
-      h('div', {id: 'user-content-getElementById'}),
-      'should prevent clobbering (#1)'
+      h('div', {id: 'user-content-getElementById'})
     )
+  })
 
+  await t.test('should prevent clobbering (#2)', async function () {
     assert.deepEqual(
       sanitize(h('div', {name: 'getElementById'})),
-      h('div', {name: 'user-content-getElementById'}),
-      'should prevent clobbering (#2)'
+      h('div', {name: 'user-content-getElementById'})
     )
+  })
 
+  await t.test('should ignore objects', async function () {
     assert.deepEqual(
-      // @ts-expect-error runtime.
-      sanitize(u('element', {tagName: 'img', properties: {alt: {toString}}})),
-      h('img'),
-      'should ignore objects'
+      sanitize({
+        type: 'element',
+        tagName: 'img',
+        properties: {
+          // @ts-expect-error: check how non-string property value is handled.
+          alt: {toString}
+        },
+        children: []
+      }),
+      h('img')
     )
+  })
 
+  await t.test('should supports arrays', async function () {
     assert.deepEqual(
-      sanitize(
-        // @ts-expect-error runtime.
-        u('element', {
-          tagName: 'img',
-          properties: {alt: [1, true, 'three', [4], {toString}]}
-        })
-      ),
-      // @ts-expect-error runtime.
-      h('img', {alt: [1, true, 'three']}),
-      'should supports arrays'
+      sanitize({
+        type: 'element',
+        tagName: 'img',
+        properties: {
+          // @ts-expect-error: check how non-string values are handled.
+          alt: [1, true, 'three', [4], {toString}]
+        },
+        children: []
+      }),
+      h('img', {alt: [1, 'three']})
     )
+  })
 
+  await t.test('should ignore `svg` elements', async function () {
     assert.deepEqual(
       sanitize(s('svg', {viewBox: '0 0 50 50'}, '!')),
-      u('text', '!'),
-      'should ignore `svg` elements'
+      u('text', '!')
+    )
+  })
+
+  await t.test('should support `href`', async function () {
+    testAllUrls('a', 'href', {
+      valid: {
+        anchor: '#heading',
+        relative: '/file.html',
+        search: 'example.com?foo:bar',
+        hash: 'example.com#foo:bar',
+        'protocol-less': 'www.example.com',
+        mailto: 'mailto:foo@bar.com',
+        https: 'http://example.com',
+        http: 'http://example.com'
+      },
+      invalid: {
+        javascript: 'javascript:alert(1)',
+        whitespace: ' javascript:while(1){}',
+        'Unicode LS/PS I': '\u2028javascript:alert(1)',
+        'Unicode Whitespace (#1)': ' javascript:alert(1)',
+        'Unicode Whitespace (#2)': ' javascript:alert(1)',
+        'infinity loop': 'javascript:while(1){}',
+        'data URL': 'data:,evilnastystuff'
+      }
+    })
+  })
+
+  await t.test('should support `cite`', async function () {
+    testAllUrls('blockquote', 'cite', {
+      valid: {
+        anchor: '#heading',
+        relative: '/file.html',
+        search: 'example.com?foo:bar',
+        hash: 'example.com#foo:bar',
+        'protocol-less': 'www.example.com',
+        https: 'http://example.com',
+        http: 'http://example.com'
+      },
+      invalid: {
+        mailto: 'mailto:foo@bar.com',
+        javascript: 'javascript:alert(1)',
+        'Unicode LS/PS I': '\u2028javascript:alert(1)',
+        'Unicode Whitespace (#1)': ' javascript:alert(1)',
+        'Unicode Whitespace (#2)': ' javascript:alert(1)',
+        'infinity loop': 'javascript:while(1){}',
+        'data URL': 'data:,evilnastystuff'
+      }
+    })
+  })
+
+  await t.test('should support `src`', async function () {
+    testAllUrls('img', 'src', {
+      valid: {
+        anchor: '#heading',
+        relative: '/file.html',
+        search: 'example.com?foo:bar',
+        hash: 'example.com#foo:bar',
+        'protocol-less': 'www.example.com',
+        https: 'http://example.com',
+        http: 'http://example.com'
+      },
+      invalid: {
+        mailto: 'mailto:foo@bar.com',
+        javascript: 'javascript:alert(1)',
+        'Unicode LS/PS I': '\u2028javascript:alert(1)',
+        'Unicode Whitespace (#1)': ' javascript:alert(1)',
+        'Unicode Whitespace (#2)': ' javascript:alert(1)',
+        'infinity loop': 'javascript:while(1){}',
+        'data URL': 'data:,evilnastystuff'
+      }
+    })
+  })
+
+  await t.test('should support `longDesc`', async function () {
+    testAllUrls('img', 'longDesc', {
+      valid: {
+        anchor: '#heading',
+        relative: '/file.html',
+        search: 'example.com?foo:bar',
+        hash: 'example.com#foo:bar',
+        'protocol-less': 'www.example.com',
+        https: 'http://example.com',
+        http: 'http://example.com'
+      },
+      invalid: {
+        mailto: 'mailto:foo@bar.com',
+        javascript: 'javascript:alert(1)',
+        'Unicode LS/PS I': '\u2028javascript:alert(1)',
+        'Unicode Whitespace (#1)': ' javascript:alert(1)',
+        'Unicode Whitespace (#2)': ' javascript:alert(1)',
+        'infinity loop': 'javascript:while(1){}',
+        'data URL': 'data:,evilnastystuff'
+      }
+    })
+  })
+
+  await t.test('should allow `li` outside list', async function () {
+    assert.deepEqual(sanitize(h('li', 'alert(1)')), h('li', 'alert(1)'))
+  })
+
+  await t.test('should allow `li` in `ol`', async function () {
+    assert.deepEqual(
+      sanitize(h('ol', h('li', 'alert(1)'))),
+      h('ol', h('li', 'alert(1)'))
+    )
+  })
+
+  await t.test('should allow `li` in `ul`', async function () {
+    assert.deepEqual(
+      sanitize(h('ul', h('li', 'alert(1)'))),
+      h('ul', h('li', 'alert(1)'))
+    )
+  })
+
+  await t.test('should allow `li` descendant `ol`', async function () {
+    assert.deepEqual(
+      sanitize(h('ol', h('div', h('li', 'alert(1)')))),
+      h('ol', h('div', h('li', 'alert(1)')))
+    )
+  })
+
+  await t.test('should allow `li` descendant `ul`', async function () {
+    assert.deepEqual(
+      sanitize(h('ul', h('div', h('li', 'alert(1)')))),
+      h('ul', h('div', h('li', 'alert(1)')))
+    )
+  })
+
+  const tableNames = ['tr', 'td', 'th', 'tbody', 'thead', 'tfoot']
+  let index = -1
+
+  while (++index < tableNames.length) {
+    const name = tableNames[index]
+
+    await t.test(
+      'should not allow `' + name + '` outside `table`',
+      async function () {
+        assert.deepEqual(sanitize(h(name, 'alert(1)')), u('text', 'alert(1)'))
+      }
     )
 
-    await t.test('href`', () => {
-      testAllUrls('a', 'href', {
-        valid: {
-          anchor: '#heading',
-          relative: '/file.html',
-          search: 'example.com?foo:bar',
-          hash: 'example.com#foo:bar',
-          'protocol-less': 'www.example.com',
-          mailto: 'mailto:foo@bar.com',
-          https: 'http://example.com',
-          http: 'http://example.com'
-        },
-        invalid: {
-          javascript: 'javascript:alert(1)',
-          whitespace: ' javascript:while(1){}',
-          'Unicode LS/PS I': '\u2028javascript:alert(1)',
-          'Unicode Whitespace (#1)': ' javascript:alert(1)',
-          'Unicode Whitespace (#2)': ' javascript:alert(1)',
-          'infinity loop': 'javascript:while(1){}',
-          'data URL': 'data:,evilnastystuff'
-        }
-      })
-    })
-
-    await t.test('`cite`', () => {
-      testAllUrls('blockquote', 'cite', {
-        valid: {
-          anchor: '#heading',
-          relative: '/file.html',
-          search: 'example.com?foo:bar',
-          hash: 'example.com#foo:bar',
-          'protocol-less': 'www.example.com',
-          https: 'http://example.com',
-          http: 'http://example.com'
-        },
-        invalid: {
-          mailto: 'mailto:foo@bar.com',
-          javascript: 'javascript:alert(1)',
-          'Unicode LS/PS I': '\u2028javascript:alert(1)',
-          'Unicode Whitespace (#1)': ' javascript:alert(1)',
-          'Unicode Whitespace (#2)': ' javascript:alert(1)',
-          'infinity loop': 'javascript:while(1){}',
-          'data URL': 'data:,evilnastystuff'
-        }
-      })
-    })
-
-    await t.test('`src`', () => {
-      testAllUrls('img', 'src', {
-        valid: {
-          anchor: '#heading',
-          relative: '/file.html',
-          search: 'example.com?foo:bar',
-          hash: 'example.com#foo:bar',
-          'protocol-less': 'www.example.com',
-          https: 'http://example.com',
-          http: 'http://example.com'
-        },
-        invalid: {
-          mailto: 'mailto:foo@bar.com',
-          javascript: 'javascript:alert(1)',
-          'Unicode LS/PS I': '\u2028javascript:alert(1)',
-          'Unicode Whitespace (#1)': ' javascript:alert(1)',
-          'Unicode Whitespace (#2)': ' javascript:alert(1)',
-          'infinity loop': 'javascript:while(1){}',
-          'data URL': 'data:,evilnastystuff'
-        }
-      })
-    })
-
-    await t.test('`longDesc`', () => {
-      testAllUrls('img', 'longDesc', {
-        valid: {
-          anchor: '#heading',
-          relative: '/file.html',
-          search: 'example.com?foo:bar',
-          hash: 'example.com#foo:bar',
-          'protocol-less': 'www.example.com',
-          https: 'http://example.com',
-          http: 'http://example.com'
-        },
-        invalid: {
-          mailto: 'mailto:foo@bar.com',
-          javascript: 'javascript:alert(1)',
-          'Unicode LS/PS I': '\u2028javascript:alert(1)',
-          'Unicode Whitespace (#1)': ' javascript:alert(1)',
-          'Unicode Whitespace (#2)': ' javascript:alert(1)',
-          'infinity loop': 'javascript:while(1){}',
-          'data URL': 'data:,evilnastystuff'
-        }
-      })
-    })
-
-    await t.test('`li`', () => {
+    await t.test('should allow `' + name + '` in `table`', async function () {
       assert.deepEqual(
-        sanitize(h('li', 'alert(1)')),
-        h('li', 'alert(1)'),
-        'should allow `li` outside list'
-      )
-
-      assert.deepEqual(
-        sanitize(h('ol', h('li', 'alert(1)'))),
-        h('ol', h('li', 'alert(1)')),
-        'should allow `li` in `ol`'
-      )
-
-      assert.deepEqual(
-        sanitize(h('ul', h('li', 'alert(1)'))),
-        h('ul', h('li', 'alert(1)')),
-        'should allow `li` in `ul`'
-      )
-
-      assert.deepEqual(
-        sanitize(h('ol', h('div', h('li', 'alert(1)')))),
-        h('ol', h('div', h('li', 'alert(1)'))),
-        'should allow `li` descendant `ol`'
-      )
-
-      assert.deepEqual(
-        sanitize(h('ul', h('div', h('li', 'alert(1)')))),
-        h('ul', h('div', h('li', 'alert(1)'))),
-        'should allow `li` descendant `ul`'
+        sanitize(h('table', h(name, 'alert(1)'))),
+        h('table', h(name, 'alert(1)'))
       )
     })
 
-    const tableNames = ['tr', 'td', 'th', 'tbody', 'thead', 'tfoot']
-    let index = -1
-
-    while (++index < tableNames.length) {
-      const name = tableNames[index]
-      await t.test('`' + name + '`', () => {
-        assert.deepEqual(
-          sanitize(h(name, 'alert(1)')),
-          u('text', 'alert(1)'),
-          'should not allow `' + name + '` outside `table`'
-        )
-
-        assert.deepEqual(
-          sanitize(h('table', h(name, 'alert(1)'))),
-          h('table', h(name, 'alert(1)')),
-          'should allow `' + name + '` in `table`'
-        )
-
+    await t.test(
+      'should allow `' + name + '` descendant `table`',
+      async function () {
         assert.deepEqual(
           sanitize(h('table', h('div', h(name, 'alert(1)')))),
-          h('table', h('div', h(name, 'alert(1)'))),
-          'should allow `' + name + '` descendant `table`'
+          h('table', h('div', h(name, 'alert(1)')))
         )
-      })
-    }
+      }
+    )
+  }
 
+  await t.test('should allow only disabled checkbox inputs', async function () {
     assert.deepEqual(
       sanitize(h('input')),
-      h('input', {type: 'checkbox', disabled: true}),
-      'should allow only disabled checkbox inputs'
+      h('input', {type: 'checkbox', disabled: true})
     )
+  })
 
+  await t.test('should not allow text inputs', async function () {
     assert.deepEqual(
       sanitize(h('input', {type: 'text'})),
-      h('input', {type: 'checkbox', disabled: true}),
-      'should not allow text inputs'
+      h('input', {type: 'checkbox', disabled: true})
     )
+  })
 
+  await t.test('should not allow enabled inputs', async function () {
     assert.deepEqual(
       sanitize(h('input', {type: 'checkbox', disabled: false})),
-      h('input', {type: 'checkbox', disabled: true}),
-      'should not allow enabled inputs'
+      h('input', {type: 'checkbox', disabled: true})
     )
+  })
 
-    assert.deepEqual(
-      sanitize(h('ol', [h('li')])),
-      h('ol', [h('li')]),
-      'should allow list items'
-    )
+  await t.test('should allow list items', async function () {
+    assert.deepEqual(sanitize(h('ol', [h('li')])), h('ol', [h('li')]))
+  })
 
+  await t.test('should not allow classes on list items', async function () {
     assert.deepEqual(
       sanitize(h('ol', [h('li', {className: ['foo', 'bar']})])),
-      h('ol', [h('li', {className: []})]),
-      'should not allow classes on list items'
+      h('ol', [h('li', {className: []})])
     )
+  })
 
-    assert.deepEqual(
-      sanitize(h('ol', [h('li', {className: ['foo', 'task-list-item']})])),
-      h('ol', [h('li', {className: ['task-list-item']})]),
-      'should only allow `task-list-item` as a class on list items'
-    )
+  await t.test(
+    'should only allow `task-list-item` as a class on list items',
+    async function () {
+      assert.deepEqual(
+        sanitize(h('ol', [h('li', {className: ['foo', 'task-list-item']})])),
+        h('ol', [h('li', {className: ['task-list-item']})])
+      )
+    }
+  )
 
-    assert.deepEqual(
-      sanitize(h('select')),
-      u('root', []),
-      'should ignore some elements by default'
-    )
+  await t.test('should ignore some elements by default', async function () {
+    assert.deepEqual(sanitize(h('select')), u('root', []))
+  })
 
-    assert.deepEqual(
-      sanitize(h('select'), deepmerge(defaultSchema, {tagNames: ['select']})),
-      h('select'),
-      'should support allowing elements through the schema'
-    )
+  await t.test(
+    'should support allowing elements through the schema',
+    async function () {
+      assert.deepEqual(
+        sanitize(h('select'), deepmerge(defaultSchema, {tagNames: ['select']})),
+        h('select')
+      )
+    }
+  )
 
+  await t.test('should ignore attributes for new elements', async function () {
     assert.deepEqual(
       sanitize(
         h('select', {autoComplete: true}),
         deepmerge(defaultSchema, {tagNames: ['select']})
       ),
-      h('select'),
-      'should ignore attributes for new elements'
+      h('select')
     )
+  })
 
-    assert.deepEqual(
-      sanitize(
-        h('select', {autoComplete: true}),
-        deepmerge(defaultSchema, {
-          tagNames: ['select'],
-          attributes: {select: ['autoComplete']}
-        })
-      ),
-      h('select', {autoComplete: true}),
-      'should support allowing attributes for new elements through the schema'
-    )
+  await t.test(
+    'should support allowing attributes for new elements through the schema',
+    async function () {
+      assert.deepEqual(
+        sanitize(
+          h('select', {autoComplete: true}),
+          deepmerge(defaultSchema, {
+            tagNames: ['select'],
+            attributes: {select: ['autoComplete']}
+          })
+        ),
+        h('select', {autoComplete: true})
+      )
+    }
+  )
 
-    assert.deepEqual(
-      sanitize(
-        h('div', [h('select', {form: 'one'}), h('select', {form: 'two'})]),
-        deepmerge(defaultSchema, {
-          tagNames: ['select'],
-          attributes: {select: [['form', 'one']]}
-        })
-      ),
-      h('div', [h('select', {form: 'one'}), h('select')]),
-      'should support a list of valid values on new attributes'
-    )
+  await t.test(
+    'should support a list of valid values on new attributes',
+    async function () {
+      assert.deepEqual(
+        sanitize(
+          h('div', [h('select', {form: 'one'}), h('select', {form: 'two'})]),
+          deepmerge(defaultSchema, {
+            tagNames: ['select'],
+            attributes: {select: [['form', 'one']]}
+          })
+        ),
+        h('div', [h('select', {form: 'one'}), h('select')])
+      )
+    }
+  )
 
-    assert.deepEqual(
-      sanitize(
+  await t.test(
+    'should support RegExp in the list of valid values',
+    async function () {
+      assert.deepEqual(
+        sanitize(
+          h('div', [
+            h('span', {className: 'a-one'}),
+            h('span', {className: 'a-two'}),
+            h('span', {className: 'b-one'}),
+            h('span', {className: 'b-two'}),
+            h('span', {className: 'a-one a-two b-one b-two'})
+          ]),
+          deepmerge(defaultSchema, {
+            tagNames: ['span'],
+            attributes: {span: [['className', /^a-/, 'b-one']]}
+          })
+        ),
         h('div', [
           h('span', {className: 'a-one'}),
           h('span', {className: 'a-two'}),
           h('span', {className: 'b-one'}),
-          h('span', {className: 'b-two'}),
-          h('span', {className: 'a-one a-two b-one b-two'})
-        ]),
-        deepmerge(defaultSchema, {
-          tagNames: ['span'],
-          attributes: {span: [['className', /^a-/, 'b-one']]}
-        })
-      ),
-      h('div', [
-        h('span', {className: 'a-one'}),
-        h('span', {className: 'a-two'}),
-        h('span', {className: 'b-one'}),
-        h('span', {className: []}),
-        h('span', {className: 'a-one a-two b-one'})
-      ]),
-      'should support RegExp in the list of valid values'
-    )
+          h('span', {className: []}),
+          h('span', {className: 'a-one a-two b-one'})
+        ])
+      )
+    }
+  )
 
+  await t.test(
+    'should not support allowing *all* attributes',
+    async function () {
+      assert.deepEqual(
+        sanitize(h('img', {title: true}), {
+          tagNames: ['img'],
+          attributes: undefined
+        }),
+        h('img')
+      )
+    }
+  )
+
+  await t.test('should support required attributes', async function () {
     assert.deepEqual(
       sanitize(
         h('div', [
@@ -649,25 +742,40 @@ test('sanitize()', async (t) => {
         h('select', {form: 'alpha'}),
         h('select', {form: 'alpha'}),
         h('select', {form: 'alpha'})
-      ]),
-      'should support required attributes'
-    )
-
-    assert.deepEqual(
-      sanitize(h('div', h('li', 'text')), {
-        tagNames: ['div', 'ul', 'li'],
-        ancestors: {li: ['ul']}
-      }),
-      h('div', 'text'),
-      'should support `ancestors` to enforce certain ancestors (rehypejs/rehype-sanitize#8)'
+      ])
     )
   })
 
-  await t.test('`root`', () => {
+  await t.test('should support not setting `required`', async function () {
+    assert.deepEqual(
+      sanitize(h('input', {checked: true}), {
+        tagNames: ['input'],
+        required: undefined
+      }),
+      h('input', {checked: true})
+    )
+  })
+
+  await t.test(
+    'should support `ancestors` to enforce certain ancestors (rehypejs/rehype-sanitize#8)',
+    async function () {
+      assert.deepEqual(
+        sanitize(h('div', h('li', 'text')), {
+          tagNames: ['div', 'ul', 'li'],
+          ancestors: {li: ['ul']}
+        }),
+        h('div', 'text')
+      )
+    }
+  )
+})
+
+test('`root`', async function (t) {
+  await t.test('should allow known properties', async function () {
     assert.deepEqual(
       sanitize({
         type: 'root',
-        // @ts-expect-error: runtime.
+        // @ts-expect-error: check how unknown properties are handled.
         tagName: 'div',
         value: 'alert(1)',
         unknown: 'alert(1)',
@@ -684,27 +792,28 @@ test('sanitize()', async (t) => {
         children: [],
         data: {href: 'alert(1)'},
         position: {
-          start: {line: 1, column: 1},
-          end: {line: 2, column: 1}
+          start: {line: 1, column: 1, offset: undefined},
+          end: {line: 2, column: 1, offset: undefined}
         }
-      },
-      'should allow known properties'
-    )
-
-    assert.deepEqual(
-      sanitize(u('root', [h('div', h('li', 'text'))]), {
-        tagNames: ['div', 'ul', 'li'],
-        ancestors: {li: ['ul']}
-      }),
-      u('root', [h('div', 'text')]),
-      'should support `ancestors` to enforce certain ancestors in a `root` (rehypejs/rehype-sanitize#8)'
+      }
     )
   })
+
+  await t.test(
+    'should support `ancestors` to enforce certain ancestors in a `root` (rehypejs/rehype-sanitize#8)',
+    async function () {
+      assert.deepEqual(
+        sanitize(u('root', [h('div', h('li', 'text'))]), {
+          tagNames: ['div', 'ul', 'li'],
+          ancestors: {li: ['ul']}
+        }),
+        u('root', [h('div', 'text')])
+      )
+    }
+  )
 })
 
-// Coverage.
-toString()
-
+// Simple value to see if `toString` is called.
 // Check.
 function toString() {
   return 'alert(1);'

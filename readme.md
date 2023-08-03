@@ -155,8 +155,8 @@ To extend the standard schema with a few changes, clone `defaultSchema` like so:
 
 ```js
 import {h} from 'hastscript'
-import deepmerge from 'deepmerge' // You can use `structuredClone` in modern JS.
-import {sanitize, defaultSchema} from 'hast-util-sanitize'
+import deepmerge from 'deepmerge'
+import {defaultSchema, sanitize} from 'hast-util-sanitize'
 
 const schema = deepmerge(defaultSchema, {attributes: {'*': ['className']}})
 
