@@ -17,8 +17,8 @@
 *   [Install](#install)
 *   [Use](#use)
 *   [API](#api)
-    *   [`sanitize(tree[, schema])`](#sanitizetree-schema)
     *   [`defaultSchema`](#defaultschema)
+    *   [`sanitize(tree[, options])`](#sanitizetree-options)
     *   [`Schema`](#schema)
 *   [Types](#types)
 *   [Compatibility](#compatibility)
@@ -44,7 +44,7 @@ sanitize HTML at a higher-level (easier) abstraction.
 ## Install
 
 This package is [ESM only][esm].
-In Node.js (version 14.14+ and 16.0+), install with [npm][]:
+In Node.js (version 16+), install with [npm][]:
 
 ```sh
 npm install hast-util-sanitize
@@ -67,12 +67,12 @@ In browsers with [`esm.sh`][esmsh]:
 ## Use
 
 ```js
-import {u} from 'unist-builder'
 import {h} from 'hastscript'
 import {sanitize} from 'hast-util-sanitize'
 import {toHtml} from 'hast-util-to-html'
+import {u} from 'unist-builder'
 
-const tree = h('div', {onmouseover: 'alert("alpha")'}, [
+const unsafe = h('div', {onmouseover: 'alert("alpha")'}, [
   h(
     'a',
     {href: 'jAva script:alert("bravo")', onclick: 'alert("charlie")'},
@@ -88,14 +88,13 @@ const tree = h('div', {onmouseover: 'alert("alpha")'}, [
   h('math', h('mi', {'xlink:href': 'data:x,<script>alert("foxtrot")</script>'}))
 ])
 
-const unsanitized = toHtml(tree)
-const sanitized = toHtml(sanitize(tree))
+const safe = sanitize(unsafe)
 
-console.log(unsanitized)
-console.log(sanitized)
+console.log(toHtml(unsafe))
+console.log(toHtml(safe))
 ```
 
-Unsanitized:
+Unsafe:
 
 ```html
 <div onmouseover="alert(&#x22;alpha&#x22;)"><a href="jAva script:alert(&#x22;bravo&#x22;)" onclick="alert(&#x22;charlie&#x22;)">delta</a>
@@ -105,7 +104,7 @@ Unsanitized:
 <math><mi xlink:href="data:x,<script>alert(&#x22;foxtrot&#x22;)</script>"></mi></math></div>
 ```
 
-Sanitized:
+Safe:
 
 ```html
 <div><a>delta</a>
@@ -117,45 +116,47 @@ Sanitized:
 
 ## API
 
-This package exports the identifiers [`defaultSchema`][defaultschema] and
-[`sanitize`][sanitize].
+This package exports the identifiers [`defaultSchema`][api-default-schema] and
+[`sanitize`][api-sanitize].
 There is no default export.
 
-### `sanitize(tree[, schema])`
+### `defaultSchema`
+
+Default schema ([`Schema`][api-schema]).
+
+Follows [GitHub][] style sanitation.
+
+### `sanitize(tree[, options])`
 
 Sanitize a tree.
 
 ###### Parameters
 
 *   `tree` ([`Node`][node])
-    — tree to clean
-*   `schema` ([`Schema`][schema], optional)
-    — schema defining how to sanitize
+    — unsafe tree
+*   `options` ([`Schema`][api-schema], default:
+    [`defaultSchema`][api-default-schema])
+    — configuration
 
 ###### Returns
 
-New, sanitized, tree ([`Node`][node]).
-
-### `defaultSchema`
-
-Default schema ([`Schema`][schema]).
-
-Follows GitHub style sanitation.
+New, safe tree ([`Node`][node]).
 
 ### `Schema`
 
-Schema that defines what nodes and properties are allowed (TypeScript type).
+Schema that defines what nodes and properties are allowed.
 
-The default schema is [`defaultSchema`][defaultschema], which follows how
-[GitHub][] cleans.
-If any top-level key is missing in the given schema, the corresponding value
-of the default schema is used.
+The default schema is [`defaultSchema`][api-default-schema], which follows how
+GitHub cleans.
+If any top-level key is missing in the given schema, the corresponding
+value of the default schema is used.
 
-To extend the standard schema with a few changes, clone `defaultSchema` like so:
+To extend the standard schema with a few changes, clone `defaultSchema`
+like so:
 
 ```js
-import {h} from 'hastscript'
 import deepmerge from 'deepmerge'
+import {h} from 'hastscript'
 import {defaultSchema, sanitize} from 'hast-util-sanitize'
 
 const schema = deepmerge(defaultSchema, {attributes: {'*': ['className']}})
@@ -174,183 +175,6 @@ console.log(tree)
 
 ##### Fields
 
-###### `attributes`
-
-Map of tag names to allowed [*property names*][name]
-(`Record<string, Array<string | [string, ...Array<string | number | boolean | RegExp>]>`,
-optional).
-
-The special key `'*'` as a tag name defines property names allowed on all
-elements.
-
-The special value `'data*'` as a property name can be used to allow all `data`
-properties.
-
-For example:
-
-```js
-attributes: {
-  a: ['href'],
-  img: ['src', 'longDesc'],
-  // …
-  '*': [
-    'abbr',
-    'accept',
-    'acceptCharset',
-    // …
-    'vSpace',
-    'width',
-    'itemProp'
-  ]
-}
-```
-
-Instead of a single string, which allows any [*property value*][value] of that
-property name, it’s also possible to provide an array to allow several values.
-For example, `input: ['type']` allows the `type` attribute set to any value on
-inputs.
-But `input: [['type', 'checkbox', 'radio']]` allows `type` only when set to one
-of the allowed values (`'checkbox'` or `'radio'`).
-
-You can also use regexes, so for example `span: [['className', /^hljs-/]]`
-allows any class that starts with `hljs-` on `span` elements.
-
-This is how the default GitHub schema allows only disabled checkbox inputs:
-
-```js
-attributes: {
-  // …
-  input: [
-    ['type', 'checkbox'],
-    ['disabled', true]
-  ]
-  // …
-}
-```
-
-Attributes also plays well with properties that accept space- or
-comma-separated values, such as `class`.
-Say you wanted to allow certain classes on `span` elements for syntax
-highlighting, that can be done like this:
-
-```js
-// …
-span: [
-  ['className', 'token', 'number', 'operator']
-]
-// …
-```
-
-###### `required`
-
-Map of tag names to required [*property names*][name] and their default
-[*property value*][value] (`Record<string, Record<string, unknown>>`,
-optional).
-
-If the defined keys do not exist in an element’s properties, they are added and
-set to the specified value.
-
-Note that properties are first checked based on the schema at `attributes`,
-so properties could be removed by that step and then added again through
-`required`.
-
-For example:
-
-```js
-required: {
-  input: {type: 'checkbox', disabled: true}
-}
-```
-
-###### `tagNames`
-
-List of allowed tag names (`Array<string>`, optional).
-
-For example:
-
-```js
-tagNames: [
-  'h1',
-  'h2',
-  'h3',
-  // …
-  'strike',
-  'summary',
-  'details'
-]
-```
-
-###### `protocols`
-
-Map of [*property names*][name] to allowed protocols
-(`Record<string, Array<string>>`, optional).
-
-The listed property names can be set to URLs that are local (relative to the
-current website, such as `this`, `#this`, `/this`, or `?this`) or remote (such
-as `https://example.com`), in which case they must have a protocol that is
-allowed here.
-
-For example:
-
-```js
-protocols: {
-  href: ['http', 'https', 'mailto'],
-  // …
-  longDesc: ['http', 'https']
-}
-```
-
-###### `ancestors`
-
-Map of tag names to a list of tag names which are required ancestors
-(`Record<string, Array<string>>`, optional).
-
-Elements with these tag names will be ignored if they occur outside of one of
-their allowed parents.
-
-For example:
-
-```js
-ancestors: {
-  li: ['ol', 'ul'],
-  // …
-  tr: ['table']
-}
-```
-
-###### `clobber`
-
-List of [*property names*][name] that clobber (`Array<string>`, optional).
-
-For example:
-
-```js
-clobber: ['name', 'id']
-```
-
-###### `clobberPrefix`
-
-Prefix to use before clobbering properties (`string`, optional).
-
-For example:
-
-```js
-clobberPrefix: 'user-content-'
-```
-
-###### `strip`
-
-List of tag names to strip from the tree (`Array<string>`, optional).
-
-By default, unsafe elements are replaced by their children.
-Some elements should however be entirely stripped from the tree.
-
-For example:
-
-```js
-strip: ['script']
-```
-
 ###### `allowComments`
 
 Whether to allow comment nodes (`boolean`, default: `false`).
@@ -365,14 +189,179 @@ allowComments: true
 
 Whether to allow doctype nodes (`boolean`, default: `false`).
 
+For example:
+
 ```js
 allowDoctypes: true
+```
+
+###### `ancestors`
+
+Map of tag names to a list of tag names which are required ancestors
+(`Record<string, Array<string>>`, default: `defaultSchema.ancestors`).
+
+Elements with these tag names will be ignored if they occur outside of one
+of their allowed parents.
+
+For example:
+
+```js
+ancestors: {
+  tbody: ['table'],
+  // …
+  tr: ['table']
+}
+```
+
+###### `attributes`
+
+Map of tag names to allowed [property names][name]
+(`Record<string, Array<[string, ...Array<RegExp | boolean | number | string>] | string>`,
+default: `defaultSchema.attributes`).
+
+The special key `'*'` as a tag name defines property names allowed on all
+elements.
+
+The special value `'data*'` as a property name can be used to allow all `data`
+properties.
+
+For example:
+
+```js
+attributes: {
+  a: ['href'],
+  // …
+  img: ['src', 'longDesc'],
+  // …
+  '*': [
+    'abbr',
+    'accept',
+    'acceptCharset',
+    // …
+    'vSpace',
+    'value',
+    'width'
+  ]
+}
+```
+
+Instead of a single string in the array, which allows any property value for
+the field, you can use an array to allow several values.
+For example, `input: ['type']` allows `type` set to any value on `input`s.
+But `input: [['type', 'checkbox', 'radio']]` allows `type` when set to
+`'checkbox'` or `'radio'`.
+
+You can use regexes, so for example `span: [['className', /^hljs-/]]` allows
+any class that starts with `hljs-` on `span`s.
+
+When comma- or space-separated values are used (such as `className`), each
+value in is checked individually.
+For example, to allow certain classes on `span`s for syntax highlighting, use
+`span: [['className', 'number', 'operator', 'token']]`.
+This will allow `'number'`, `'operator'`, and `'token'` classes, but drop
+others.
+
+###### `clobber`
+
+List of [*property names*][name] that clobber (`Array<string>`, default:
+`defaultSchema.clobber`).
+
+For example:
+
+```js
+clobber: ['id', 'name']
+```
+
+###### `clobberPrefix`
+
+Prefix to use before clobbering properties (`string`, default:
+`defaultSchema.clobberPrefix`).
+
+For example:
+
+```js
+clobberPrefix: 'user-content-'
+```
+
+###### `protocols`
+
+Map of [*property names*][name] to allowed protocols
+(`Record<string, Array<string>>`, default: `defaultSchema.protocols`).
+
+This defines URLs that are always allowed to have local URLs (relative to
+the current website, such as `this`, `#this`, `/this`, or `?this`), and
+only allowed to have remote URLs (such as `https://example.com`) if they
+use a known protocol.
+
+For example:
+
+```js
+protocols: {
+  href: ['http', 'https', 'irc', 'ircs', 'mailto', 'xmpp'],
+  // …
+  longDesc: ['http', 'https']
+}
+```
+
+###### `required`
+
+Map of tag names to required [*property names*][name] with a default value
+(`Record<string, Record<string, unknown>>`, default: `defaultSchema.required`).
+
+This defines properties that must be set.
+If a field does not exist (after the element was made safe), these will be
+added with the given value.
+
+For example:
+
+```js
+required: {
+  input: {disabled: true, type: 'checkbox'}
+}
+```
+
+> 👉 **Note**: properties are first checked based on `schema.attributes`,
+> then on `schema.required`.
+> That means properties could be removed by `attributes` and then added
+> again with `required`.
+
+###### `strip`
+
+List of tag names to strip from the tree (`Array<string>`, default:
+`defaultSchema.strip`).
+
+By default, unsafe elements (those not in `schema.tagNames`) are replaced by
+what they contain.
+This option can drop their contents.
+
+For example:
+
+```js
+strip: ['script']
+```
+
+###### `tagNames`
+
+List of allowed tag names (`Array<string>`, default: `defaultSchema.tagNames`).
+
+For example:
+
+```js
+tagNames: [
+  'a',
+  'abbr',
+  'b',
+  // …
+  'ul',
+  'var',
+  'wbr'
+]
 ```
 
 ## Types
 
 This package is fully typed with [TypeScript][].
-It exports the additional type [`Schema`][schema].
+It exports the additional type [`Schema`][api-schema].
 
 ## Compatibility
 
@@ -463,16 +452,14 @@ abide by its terms.
 
 [name]: https://github.com/syntax-tree/hast#propertyname
 
-[value]: https://github.com/syntax-tree/hast#propertyvalue
-
-[github]: https://github.com/jch/html-pipeline/blob/HEAD/lib/html/pipeline/sanitization_filter.rb
+[github]: https://github.com/gjtorikian/html-pipeline/blob/a2e02ac/lib/html_pipeline/sanitization_filter.rb
 
 [xss]: https://en.wikipedia.org/wiki/Cross-site_scripting
 
 [rehype-sanitize]: https://github.com/rehypejs/rehype-sanitize
 
-[defaultschema]: #defaultschema
+[api-default-schema]: #defaultschema
 
-[sanitize]: #sanitizetree-schema
+[api-sanitize]: #sanitizetree-options
 
-[schema]: #schema
+[api-schema]: #schema
