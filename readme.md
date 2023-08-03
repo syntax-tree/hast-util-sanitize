@@ -53,14 +53,14 @@ npm install hast-util-sanitize
 In Deno with [`esm.sh`][esmsh]:
 
 ```js
-import {sanitize} from 'https://esm.sh/hast-util-sanitize@4'
+import {sanitize} from 'https://esm.sh/hast-util-sanitize@5'
 ```
 
 In browsers with [`esm.sh`][esmsh]:
 
 ```html
 <script type="module">
-  import {sanitize} from 'https://esm.sh/hast-util-sanitize@4?bundle'
+  import {sanitize} from 'https://esm.sh/hast-util-sanitize@5?bundle'
 </script>
 ```
 
