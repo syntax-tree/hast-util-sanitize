@@ -7,11 +7,11 @@ import fs from 'node:fs/promises'
 import {ariaAttributes} from 'aria-attributes'
 import {h} from 'hastscript'
 import {fromHtml} from 'hast-util-from-html'
+import {defaultSchema} from 'hast-util-sanitize'
 import {toHtml} from 'hast-util-to-html'
 import {htmlElementAttributes} from 'html-element-attributes'
 import {htmlTagNames} from 'html-tag-names'
 import {visit} from 'unist-util-visit'
-import {defaultSchema} from '../index.js'
 
 const schemaAncestors = defaultSchema.ancestors
 const schemaAttributes = defaultSchema.attributes
