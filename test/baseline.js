@@ -106,7 +106,6 @@ for (const [tagName, key, value] of extras) {
 // Final EOL.
 root.children.push({type: 'text', value: '\n'})
 
-// @ts-expect-error: remove when `to-html` is released.
 const document = toHtml(root)
 
 await fs.writeFile(new URL('input.html', import.meta.url), document)
@@ -115,8 +114,6 @@ const githubReferenceHtml = String(
   await fs.readFile(new URL('github.html', import.meta.url))
 )
 
-/** @type {Root} */
-// @ts-expect-error: remove when `from-html` is released.
 const tree = fromHtml(githubReferenceHtml, {fragment: true})
 
 /** @type {Set<string>} */

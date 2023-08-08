@@ -49,7 +49,6 @@ test('sanitize()', async function (t) {
   await t.test('should ignore unknown nodes', async function () {
     assert.equal(
       toHtml(
-        // @ts-expect-error: remove when `hast-util-to-html` updates.
         sanitize(
           // @ts-expect-error: check how an unknown node is
           u('unknown', '<xml></xml>')
@@ -62,23 +61,14 @@ test('sanitize()', async function (t) {
 
 test('`comment`', async function (t) {
   await t.test('should ignore `comment`s by default', async function () {
-    assert.equal(
-      toHtml(
-        // @ts-expect-error: remove when `hast-util-to-html` updates.
-        sanitize(u('comment', 'alpha'))
-      ),
-      ''
-    )
+    assert.equal(toHtml(sanitize(u('comment', 'alpha'))), '')
   })
 
   await t.test(
     'should allow `comment`s with `allowComments: true`',
     async function () {
       assert.equal(
-        toHtml(
-          // @ts-expect-error: remove when `hast-util-to-html` updates.
-          sanitize(u('comment', 'alpha'), {allowComments: true})
-        ),
+        toHtml(sanitize(u('comment', 'alpha'), {allowComments: true})),
         '<!--alpha-->'
       )
     }
@@ -102,7 +92,6 @@ test('`comment`', async function (t) {
     async function () {
       assert.equal(
         toHtml(
-          // @ts-expect-error: remove when `hast-util-to-html` updates.
           sanitize(u('comment', 'alpha--><script>alert(1)</script><!--bravo'), {
             allowComments: true
           })
@@ -115,11 +104,7 @@ test('`comment`', async function (t) {
 
 test('`doctype`', async function (t) {
   await t.test('should ignore `doctype`s by default', async function () {
-    assert.equal(
-      // @ts-expect-error: remove when `hast-util-to-html` updates.
-      toHtml(sanitize(u('doctype', {name: 'html'}, 'alpha'))),
-      ''
-    )
+    assert.equal(toHtml(sanitize(u('doctype', {name: 'html'}, 'alpha'))), '')
   })
 
   await t.test(
@@ -127,7 +112,6 @@ test('`doctype`', async function (t) {
     async function () {
       assert.equal(
         toHtml(
-          // @ts-expect-error: remove when `hast-util-to-html` updates.
           sanitize(u('doctype', {name: 'html'}, 'alpha'), {
             allowDoctypes: true
           })
@@ -168,11 +152,7 @@ test('`text`', async function (t) {
   })
 
   await t.test('should allow `text`', async function () {
-    assert.equal(
-      // @ts-expect-error: remove when `hast-util-to-html` updates.
-      toHtml(sanitize(u('text', 'alert(1)'))),
-      'alert(1)'
-    )
+    assert.equal(toHtml(sanitize(u('text', 'alert(1)'))), 'alert(1)')
   })
 
   await t.test('should ignore non-string `value`s', async function () {
@@ -184,21 +164,12 @@ test('`text`', async function (t) {
   })
 
   await t.test('should ignore `text` in `script` elements', async function () {
-    assert.equal(
-      toHtml(
-        // @ts-expect-error: remove when `hast-util-to-html` updates.
-        sanitize(h('script', u('text', 'alert(1)')))
-      ),
-      ''
-    )
+    assert.equal(toHtml(sanitize(h('script', u('text', 'alert(1)')))), '')
   })
 
   await t.test('should show `text` in `style` elements', async function () {
     assert.equal(
-      toHtml(
-        // @ts-expect-error: remove when `hast-util-to-html` updates.
-        sanitize(h('style', u('text', 'alert(1)')))
-      ),
+      toHtml(sanitize(h('style', u('text', 'alert(1)')))),
       'alert(1)'
     )
   })
