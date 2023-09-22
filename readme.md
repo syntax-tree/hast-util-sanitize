@@ -144,7 +144,8 @@ Follows [GitHub][] style sanitation.
 
 #### Overriding the default schema
 
-In some cases, it may be necessary to override the default schema. In the example below, notice how the `id` attribute of the `<h2>` tag is removed, while the `<h1>` tag is unaltered.
+In some cases, it may be necessary to override the default schema. In the example below, 
+notice how the `id` attribute of the `<h2>` tag is removed, while the `<h1>` tag is unaltered.
 
 ```js
 import rehypeParse from "rehype-parse"
@@ -168,7 +169,9 @@ console.log(String(file))
 // <h2>From a poor family</h2>
 ```
 
-This happens because the [default schema](https://github.com/syntax-tree/hast-util-sanitize/blob/main/lib/schema.js) only allows `id` equal to `'footnote-label'` for `<h2>` tags.
+This happens because the 
+[default schema](https://github.com/syntax-tree/hast-util-sanitize/blob/main/lib/schema.js) 
+only allows `id` equal to `'footnote-label'` for `<h2>` tags.
 
 ```js
 // lib/schema.js
@@ -219,7 +222,6 @@ console.log(String(file))
 // <h1 id="user-content-bohemian">I'm just a poor boy</h1>
 // <h2>From a poor family</h2>
 ```
-
 
 ### `sanitize(tree[, options])`
 
