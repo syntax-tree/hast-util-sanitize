@@ -12,20 +12,36 @@
 
 ## Contents
 
-*   [What is this?](#what-is-this)
-*   [When should I use this?](#when-should-i-use-this)
-*   [Install](#install)
-*   [Use](#use)
-*   [API](#api)
-    *   [`defaultSchema`](#defaultschema)
-    *   [`sanitize(tree[, options])`](#sanitizetree-options)
-    *   [`Schema`](#schema)
-*   [Types](#types)
-*   [Compatibility](#compatibility)
-*   [Security](#security)
-*   [Related](#related)
-*   [Contribute](#contribute)
-*   [License](#license)
+- [hast-util-sanitize](#hast-util-sanitize)
+  - [Contents](#contents)
+  - [What is this?](#what-is-this)
+  - [When should I use this?](#when-should-i-use-this)
+  - [Install](#install)
+  - [Use](#use)
+  - [API](#api)
+    - [`defaultSchema`](#defaultschema)
+      - [Overriding the default schema](#overriding-the-default-schema)
+    - [`sanitize(tree[, options])`](#sanitizetree-options)
+          - [Parameters](#parameters)
+          - [Returns](#returns)
+    - [`Schema`](#schema)
+        - [Fields](#fields)
+          - [`allowComments`](#allowcomments)
+          - [`allowDoctypes`](#allowdoctypes)
+          - [`ancestors`](#ancestors)
+          - [`attributes`](#attributes)
+          - [`clobber`](#clobber)
+          - [`clobberPrefix`](#clobberprefix)
+          - [`protocols`](#protocols)
+          - [`required`](#required)
+          - [`strip`](#strip)
+          - [`tagNames`](#tagnames)
+  - [Types](#types)
+  - [Compatibility](#compatibility)
+  - [Security](#security)
+  - [Related](#related)
+  - [Contribute](#contribute)
+  - [License](#license)
 
 ## What is this?
 
@@ -124,7 +140,86 @@ There is no default export.
 
 Default schema ([`Schema`][api-schema]).
 
-Follows [GitHub][] style sanitation.
+Follows [GitHub][] style sanitation. 
+
+#### Overriding the default schema
+
+In some cases, it may be necessary to override the default schema. In the example below, notice how the `id` attribute of the `<h2>` is removed, while the `<h1>` tag is unaltered.
+
+```js
+import rehypeParse from "rehype-parse"
+import rehypeSanitize from "rehype-sanitize"
+import rehypeStringify from "rehype-stringify"
+import { unified } from "unified"
+
+const file = await unified()
+  .use(rehypeParse)
+  .use(rehypeSanitize)
+  .use(rehypeStringify)
+  .process(
+    `<h1 id="bohemian">I'm just a poor boy</h1>
+<h2 id="rhapsody">From a poor family</h2>`
+  )
+
+console.log(String(file))
+
+// === Output ========
+// <h1 id="user-content-bohemian">I'm just a poor boy</h1>
+// <h2>From a poor family</h2>
+```
+
+This happens because the [default schema](https://github.com/syntax-tree/hast-util-sanitize/blob/main/lib/schema.js) only allows `id` equal to `'footnote-label'` for `<h2>` tags.
+
+```js
+// lib/schema.js
+
+export const defaultSchema = {
+  ancestors: {...},
+  attributes: {
+  ...
+  h2: [
+        ['id', 'footnote-label'],
+        ['className', 'sr-only'],
+      ],
+  ...
+  }
+}
+```
+
+To get around this, override the default schema.
+
+```js
+import { defaultSchema } from "hast-util-sanitize"
+import rehypeParse from "rehype-parse"
+import rehypeSanitize from "rehype-sanitize"
+import rehypeStringify from "rehype-stringify"
+import { unified } from "unified"
+
+// Copy the default schema
+const schema = { ...defaultSchema }
+
+// Give <h2> tags permission to have an id named "rhapsody"
+schema["attributes"]["h2"] = ["id", "rhapsody"]
+
+// Inpsect the final schema
+console.log(schema)
+
+const file = await unified()
+  .use(rehypeParse)
+  .use(rehypeSanitize, schema)
+  .use(rehypeStringify)
+  .process(
+    `<h1 id="bohemian">I'm just a poor boy</h1>
+<h2 id="rhapsody">From a poor family</h2>`
+  )
+
+console.log(String(file))
+
+// === Output ========
+// <h1 id="user-content-bohemian">I'm just a poor boy</h1>
+// <h2>From a poor family</h2>
+```
+
 
 ### `sanitize(tree[, options])`
 
