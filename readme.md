@@ -144,7 +144,7 @@ Follows [GitHub][] style sanitation.
 
 #### Overriding the default schema
 
-In some cases, it may be necessary to override the default schema. In the example below, notice how the `id` attribute of the `<h2>` is removed, while the `<h1>` tag is unaltered.
+In some cases, it may be necessary to override the default schema. In the example below, notice how the `id` attribute of the `<h2>` tag is removed, while the `<h1>` tag is unaltered.
 
 ```js
 import rehypeParse from "rehype-parse"
