@@ -9,6 +9,34 @@ import {u} from 'unist-builder'
 const own = {}.hasOwnProperty
 
 test('sanitize()', async function (t) {
+  await t.test('check', async function () {
+    const attributes = defaultSchema.attributes
+    assert(attributes)
+
+    const generic = new Set(
+      attributes['*'].map((d) => (typeof d === 'string' ? d : d[0]))
+    )
+
+    for (const tagName in attributes) {
+      if (tagName !== '*' && Object.hasOwn(attributes, tagName)) {
+        const allowed = attributes[tagName]
+
+        for (const attribute of allowed) {
+          const name = typeof attribute === 'string' ? attribute : attribute[0]
+
+          assert(
+            generic.has(name) === false,
+            'unexpected attribute `' +
+              name +
+              '` in both `*` and `' +
+              tagName +
+              '`, they conflict, please use one or the other'
+          )
+        }
+      }
+    }
+  })
+
   await t.test('should expose the public api', async function () {
     assert.deepEqual(Object.keys(await import('hast-util-sanitize')).sort(), [
       'defaultSchema',
@@ -736,6 +764,47 @@ test('`element`', async function (t) {
           ancestors: {li: ['ul']}
         }),
         h('div', 'text')
+      )
+    }
+  )
+
+  await t.test(
+    'should allow specific values allowed by either a specific or generic attribute definition (1)',
+    async function () {
+      assert.deepEqual(
+        sanitize(
+          h(null, [h('a', {x: 'y'}), h('a', {x: 'z'}), h('a', {x: 'w'})]),
+          {...defaultSchema, attributes: {a: [['x', 'y']], '*': [['x', 'z']]}}
+        ),
+        h(null, [h('a', {x: 'y'}), h('a', {x: 'z'}), h('a')])
+      )
+    }
+  )
+
+  await t.test(
+    'should allow specific values allowed by either a specific or generic attribute definition (2)',
+    async function () {
+      assert.deepEqual(
+        sanitize(
+          h(null, [h('a', {x: 'y'}), h('a', {x: 'z'}), h('a', {x: 'w'})]),
+          // `x` on `*` can contain anything:
+          {...defaultSchema, attributes: {a: ['x'], '*': [['x', 'z']]}}
+        ),
+        h(null, [h('a', {x: 'y'}), h('a', {x: 'z'}), h('a', {x: 'w'})])
+      )
+    }
+  )
+
+  await t.test(
+    'should allow specific values allowed by either a specific or generic attribute definition (3)',
+    async function () {
+      assert.deepEqual(
+        sanitize(
+          h(null, [h('a', {x: 'y'}), h('a', {x: 'z'}), h('a', {x: 'w'})]),
+          // `x` on `*` can contain anything:
+          {...defaultSchema, attributes: {a: [['x', 'y']], '*': ['x']}}
+        ),
+        h(null, [h('a', {x: 'y'}), h('a', {x: 'z'}), h('a', {x: 'w'})])
       )
     }
   )
