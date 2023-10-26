@@ -347,14 +347,14 @@ test('`element`', async function (t) {
     )
   })
 
-  await t.test('should prevent clobbering (#1)', async function () {
+  await t.test('should prevent clobbering (`id`)', async function () {
     assert.deepEqual(
       sanitize(h('div', {id: 'getElementById'})),
       h('div', {id: 'user-content-getElementById'})
     )
   })
 
-  await t.test('should prevent clobbering (#2)', async function () {
+  await t.test('should prevent clobbering (`name`)', async function () {
     assert.deepEqual(
       sanitize(h('div', {name: 'getElementById'})),
       h('div', {name: 'user-content-getElementById'})
