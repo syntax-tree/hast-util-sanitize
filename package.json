@@ -57,7 +57,7 @@
     "typescript": "^5.0.0",
     "unist-builder": "^4.0.0",
     "unist-util-visit": "^5.0.0",
-    "xo": "^0.55.0"
+    "xo": "^0.56.0"
   },
   "scripts": {
     "prepack": "npm run build && npm run format",
