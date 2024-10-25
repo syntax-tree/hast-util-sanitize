@@ -1,6 +1,7 @@
 {
   "compilerOptions": {
     "checkJs": true,
+    "declarationMap": true,
     "declaration": true,
     "emitDeclarationOnly": true,
     "exactOptionalPropertyTypes": true,
