@@ -1,44 +1,16 @@
 {
-  "name": "hast-util-sanitize",
-  "version": "5.0.1",
-  "description": "hast utility to sanitize nodes",
-  "license": "MIT",
-  "keywords": [
-    "unist",
-    "hast",
-    "hast-util",
-    "util",
-    "utility",
-    "html",
-    "clean",
-    "xss",
-    "safe",
-    "sanitize"
-  ],
-  "repository": "syntax-tree/hast-util-sanitize",
-  "bugs": "https://github.com/syntax-tree/hast-util-sanitize/issues",
-  "funding": {
-    "type": "opencollective",
-    "url": "https://opencollective.com/unified"
-  },
   "author": "Titus Wormer <tituswormer@gmail.com> (https://wooorm.com)",
+  "bugs": "https://github.com/syntax-tree/hast-util-sanitize/issues",
   "contributors": [
-    "Titus Wormer <tituswormer@gmail.com> (https://wooorm.com)",
-    "Jason Switzer <jswitzer@gmail.com>"
-  ],
-  "sideEffects": false,
-  "type": "module",
-  "exports": "./index.js",
-  "files": [
-    "lib/",
-    "index.d.ts",
-    "index.js"
+    "Jason Switzer <jswitzer@gmail.com>",
+    "Titus Wormer <tituswormer@gmail.com> (https://wooorm.com)"
   ],
   "dependencies": {
     "@types/hast": "^3.0.0",
     "@ungap/structured-clone": "^1.0.0",
     "unist-util-position": "^5.0.0"
   },
+  "description": "hast utility to sanitize nodes",
   "devDependencies": {
     "@types/node": "^22.0.0",
     "@types/ungap__structured-clone": "^1.0.0",
@@ -59,14 +31,30 @@
     "unist-util-visit": "^5.0.0",
     "xo": "^0.59.0"
   },
-  "scripts": {
-    "prepack": "npm run build && npm run format",
-    "build": "tsc --build --clean && tsc --build && type-coverage",
-    "format": "remark . -qfo && prettier . -w --log-level warn && xo --fix",
-    "test-api": "node --conditions development test/index.js",
-    "test-coverage": "c8 --100 --reporter lcov npm run test-api",
-    "test": "npm run build && npm run format && npm run test-coverage"
+  "exports": "./index.js",
+  "files": [
+    "lib/",
+    "index.d.ts",
+    "index.js"
+  ],
+  "funding": {
+    "type": "opencollective",
+    "url": "https://opencollective.com/unified"
   },
+  "keywords": [
+    "clean",
+    "hast-util",
+    "hast",
+    "html",
+    "safe",
+    "sanitize",
+    "utility",
+    "util",
+    "unist",
+    "xss"
+  ],
+  "license": "MIT",
+  "name": "hast-util-sanitize",
   "prettier": {
     "bracketSpacing": false,
     "semi": false,
@@ -80,16 +68,25 @@
       "remark-preset-wooorm"
     ]
   },
+  "repository": "syntax-tree/hast-util-sanitize",
+  "scripts": {
+    "build": "tsc --build --clean && tsc --build && type-coverage",
+    "format": "remark . -qfo && prettier . -w --log-level warn && xo --fix",
+    "test-api": "node --conditions development test/index.js",
+    "test-coverage": "c8 --100 --reporter lcov npm run test-api",
+    "test": "npm run build && npm run format && npm run test-coverage"
+  },
+  "sideEffects": false,
   "typeCoverage": {
     "atLeast": 100,
-    "detail": true,
-    "ignoreCatch": true,
     "#": "Couple of needed `any`s",
     "ignoreFiles": [
       "lib/index.d.ts"
     ],
     "strict": true
   },
+  "type": "module",
+  "version": "5.0.1",
   "xo": {
     "overrides": [
       {
