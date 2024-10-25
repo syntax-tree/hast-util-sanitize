@@ -192,12 +192,12 @@ test('`text`', async function (t) {
   })
 
   await t.test('should ignore `text` in `script` elements', async function () {
-    assert.equal(toHtml(sanitize(h('script', u('text', 'alert(1)')))), '')
+    assert.equal(toHtml(sanitize(h('script', {}, u('text', 'alert(1)')))), '')
   })
 
   await t.test('should show `text` in `style` elements', async function () {
     assert.equal(
-      toHtml(sanitize(h('style', u('text', 'alert(1)')))),
+      toHtml(sanitize(h('style', {}, u('text', 'alert(1)')))),
       'alert(1)'
     )
   })
@@ -236,7 +236,7 @@ test('`element`', async function (t) {
 
   await t.test('should ignore unknown elements', async function () {
     assert.deepEqual(
-      sanitize(h('unknown', u('text', 'alert(1)'))),
+      sanitize(h('unknown', {}, u('text', 'alert(1)'))),
       u('text', 'alert(1)')
     )
   })
@@ -860,36 +860,36 @@ function toString() {
 }
 
 /**
- * Test `valid` and `invalid` `url`s in `prop` on `tagName`.
+ * Test `valid` and `invalid` `url`s in `property` on `tagName`.
  *
  * @param {string} tagName
- * @param {string} prop
+ * @param {string} property
  * @param {{valid: Record<string, string>, invalid: Record<string, string>}} all
  */
-function testAllUrls(tagName, prop, all) {
-  testUrls(tagName, prop, all.valid, true)
-  testUrls(tagName, prop, all.invalid, false)
+function testAllUrls(tagName, property, all) {
+  testUrls(tagName, property, all.valid, true)
+  testUrls(tagName, property, all.invalid, false)
 }
 
 /**
- * Test `valid` `url`s in `prop` on `tagName`.
+ * Test `valid` `url`s in `property` on `tagName`.
  *
  * @param {string} tagName
- * @param {string} prop
+ * @param {string} property
  * @param {Record<string, string>} urls
  * @param {boolean} valid
  */
-function testUrls(tagName, prop, urls, valid) {
+function testUrls(tagName, property, urls, valid) {
   /** @type {string} */
   let name
 
   for (name in urls) {
     if (own.call(urls, name)) {
-      const props = {[prop]: urls[name]}
+      const properties_ = {[property]: urls[name]}
 
       assert.deepEqual(
-        sanitize(h(tagName, props)),
-        h(tagName, valid ? props : {}),
+        sanitize(h(tagName, properties_)),
+        h(tagName, valid ? properties_ : {}),
         'should ' + (valid ? 'allow' : 'clean') + ' ' + name
       )
     }

@@ -12,20 +12,20 @@
 
 ## Contents
 
-*   [What is this?](#what-is-this)
-*   [When should I use this?](#when-should-i-use-this)
-*   [Install](#install)
-*   [Use](#use)
-*   [API](#api)
-    *   [`defaultSchema`](#defaultschema)
-    *   [`sanitize(tree[, options])`](#sanitizetree-options)
-    *   [`Schema`](#schema)
-*   [Types](#types)
-*   [Compatibility](#compatibility)
-*   [Security](#security)
-*   [Related](#related)
-*   [Contribute](#contribute)
-*   [License](#license)
+* [What is this?](#what-is-this)
+* [When should I use this?](#when-should-i-use-this)
+* [Install](#install)
+* [Use](#use)
+* [API](#api)
+  * [`defaultSchema`](#defaultschema)
+  * [`sanitize(tree[, options])`](#sanitizetree-options)
+  * [`Schema`](#schema)
+* [Types](#types)
+* [Compatibility](#compatibility)
+* [Security](#security)
+* [Related](#related)
+* [Contribute](#contribute)
+* [License](#license)
 
 ## What is this?
 
@@ -132,11 +132,11 @@ Sanitize a tree.
 
 ###### Parameters
 
-*   `tree` ([`Node`][node])
-    — unsafe tree
-*   `options` ([`Schema`][api-schema], default:
-    [`defaultSchema`][api-default-schema])
-    — configuration
+* `tree` ([`Node`][node])
+  — unsafe tree
+* `options` ([`Schema`][api-schema], default:
+  [`defaultSchema`][api-default-schema])
+  — configuration
 
 ###### Returns
 
@@ -386,8 +386,8 @@ be unsafe (but is fine if you do trust it).
 
 ## Related
 
-*   [`rehype-sanitize`](https://github.com/rehypejs/rehype-sanitize)
-    — rehype plugin
+* [`rehype-sanitize`](https://github.com/rehypejs/rehype-sanitize)
+  — rehype plugin
 
 ## Contribute
 

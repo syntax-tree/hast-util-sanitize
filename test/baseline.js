@@ -58,19 +58,19 @@ allAttributes = new Set([...allAttributes].sort())
 
 for (const name of htmlTagNames) {
   /** @type {Record<string, string>} */
-  const props = {}
+  const properties_ = {}
 
   for (const attribute of allAttributes) {
-    props[attribute] = 'x'
+    properties_[attribute] = 'x'
   }
 
-  delete props.type
+  delete properties_.type
 
   if (root.children.length > 0) {
     root.children.push({type: 'text', value: '\n\n'})
   }
 
-  let element = h(name, props, [])
+  let element = h(name, properties_, [])
 
   if (Object.hasOwn(schemaAncestors, name)) {
     const ancestor = schemaAncestors[name][0]
@@ -152,30 +152,30 @@ visit(tree, function (node) {
     )
 
     /** @type {string} */
-    let prop
+    let property
 
-    for (prop in node.properties) {
-      if (Object.hasOwn(node.properties, prop)) {
-        let value = node.properties[prop]
+    for (property in node.properties) {
+      if (Object.hasOwn(node.properties, property)) {
+        let value = node.properties[property]
 
-        if (prop === 'dir' && value === 'auto') {
+        if (property === 'dir' && value === 'auto') {
           continue
         }
 
         if (
           node.tagName === 'img' &&
-          prop === 'style' &&
+          property === 'style' &&
           value === 'max-width: 100%;'
         ) {
           continue
         }
 
-        propertyNamesSeen.add(prop)
+        propertyNamesSeen.add(property)
 
         assert(
-          entries.has(prop),
+          entries.has(property),
           'property `' +
-            prop +
+            property +
             '` was found in GH response (on `' +
             node.tagName +
             '`) but not defined in `schema.attributes` (global or specific to the element)'
@@ -187,9 +187,9 @@ visit(tree, function (node) {
 
         if (value === 'user-content-x') {
           assert(
-            schemaClobber.includes(prop),
+            schemaClobber.includes(property),
             'property `' +
-              prop +
+              property +
               '` was found in GH response (on `' +
               node.tagName +
               '`) with a clobber prefix, but not defined in `schema.clobber`'
@@ -204,36 +204,42 @@ visit(tree, function (node) {
           // Value GH sets it to with a clobber prefix.
           value === 'user-content-x' ||
           // Wrapper for images.
-          (node.tagName === 'a' && prop === 'target' && value === '_blank') ||
-          (node.tagName === 'a' && prop === 'rel' && value === 'noopener') ||
+          (node.tagName === 'a' &&
+            property === 'target' &&
+            value === '_blank') ||
+          (node.tagName === 'a' &&
+            property === 'rel' &&
+            value === 'noopener') ||
           // Footnotes.
           (node.tagName === 'a' &&
-            prop === 'ariaDescribedBy' &&
+            property === 'ariaDescribedBy' &&
             value === 'footnote-label') ||
           (node.tagName === 'a' &&
-            prop === 'href' &&
+            property === 'href' &&
             String(value).startsWith('x-')) ||
           (node.tagName === 'a' &&
-            prop === 'id' &&
+            property === 'id' &&
             String(value).startsWith('user-content-x-')) ||
           (node.tagName === 'a' &&
-            prop === 'className' &&
+            property === 'className' &&
             value === 'data-footnote-backref') ||
           (node.tagName === 'section' &&
-            prop === 'className' &&
+            property === 'className' &&
             value === 'footnotes') ||
           (node.tagName === 'h2' &&
-            prop === 'id' &&
+            property === 'id' &&
             (value === 'footnote-label' ||
               value === 'user-content-footnote-label')) ||
-          (node.tagName === 'h2' && prop === 'className' && value === 'sr-only')
+          (node.tagName === 'h2' &&
+            property === 'className' &&
+            value === 'sr-only')
         ) {
           continue
         }
 
         console.log(
           'Unexpected key `%s` (`%s`) on <%s>',
-          prop,
+          property,
           value,
           node.tagName
         )
